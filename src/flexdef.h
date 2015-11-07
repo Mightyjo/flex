@@ -417,6 +417,7 @@ extern int trace_hex;
  * dataline - number of contiguous lines of data in current data
  * 	statement.  Used to generate readable -f output
  * linenum - current input line number
+ * skelname - the skeleton file name
  * skelfile - the skeleton file
  * skel - compiled-in skeleton array
  * skel_ind - index into "skel" array, if skelfile is nil
@@ -448,7 +449,7 @@ extern int datapos, dataline, linenum;
 extern FILE *skelfile, *yyin, *backing_up_file;
 extern const char *skel[];
 extern int skel_ind;
-extern char *infilename, *outfilename, *headerfilename;
+extern char *infilename, *outfilename, *headerfilename, *skelname;
 extern int did_outfilename;
 extern char *prefix, *yyclass, *extra_type;
 extern int do_stdinit, use_stdout;

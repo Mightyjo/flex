@@ -87,8 +87,10 @@ simple_tests = \
 	prefix_nr \
 	prefix_r \
 	quotes \
+	skel_nr \
+	skel_r \
 	string_nr \
-string_r \
+	string_r \
 	top \
 	yyextra
 
@@ -163,6 +165,8 @@ reject_ver_table_SOURCES = reject.l4
 reject_ser_table_SOURCES = reject.l4
 rescan_nr_direct_SOURCES = rescan_nr.direct.l
 rescan_r_direct_SOURCES = rescan_r.direct.l
+skel_nr_SOURCES = skel_nr.l
+skel_r_SOURCES = skel_r.l
 string_nr_SOURCES = string_nr.l
 string_r_SOURCES = string_r.l
 top_SOURCES = top.l top_main.c
@@ -187,6 +191,8 @@ BUILT_SOURCES = \
 	reject_r.reject.c \
 	reject_ver.table.c \
 	reject_ser.table.c \
+	skel_nr.c \
+	skel_r.c \
 	top.h \
 	$(tableopts_c)
 
@@ -256,6 +262,7 @@ basic_nr.txt \
 	rescan_nr.direct.txt \
 	rescan_r.direct.txt \
 	quotes.txt \
+	skel.txt \
 	top.h \
 	top.txt \
 	yyextra.txt \

@@ -32,6 +32,7 @@
 /*  PURPOSE. */
 
 
+#include "configmake.h"
 #include "flexdef.h"
 #include "version.h"
 #include "options.h"
@@ -136,7 +137,7 @@ extern FILE* yyout;
 
 static char outfile_path[MAXLINE];
 static int outfile_created = 0;
-static char *skelname = NULL;
+/*static*/ char *skelname = NULL;
 static int _stdout_closed = 0; /* flag to prevent double-fclose() on stdout. */
 const char *escaped_qstart = "[[]]M4_YY_NOOP[M4_YY_NOOP[M4_YY_NOOP[[]]";
 const char *escaped_qend   = "[[]]M4_YY_NOOP]M4_YY_NOOP]M4_YY_NOOP[[]]";
@@ -223,6 +224,39 @@ int main (argc, argv)
 #endif
 
 	return flex_main (argc, argv);
+}
+
+/* pkgdatadir - prepend system package data dir to a file name */
+char* pkgdatadir(const char *filename)
+{
+#ifdef _WIN32
+	char dirsep = '\\';
+#else
+	char dirsep = '/';
+#endif
+	int need_slash = 0;
+	int namelen = strnlen(filename, 1024);  /* Limit name length to 1KB because hackers */
+	int dirlen = strlen(PKGDATADIR);  /* Trust this string for configmake.h */
+	char *ret = malloc( namelen
+	                  + dirlen
+	                  + 2 );                    /* Add room for a dirsep and a \0 */
+	/* TODO: die if malloc fails */
+	char *end = ret;
+	
+	if ( filename[0] != dirsep && PKGDATADIR[dirlen-1] != dirsep )
+		need_slash = 1;
+	
+	end = stpncpy(ret, PKGDATADIR, dirlen);
+
+	if( need_slash ) {
+		*end = dirsep;
+		++end;
+	}
+
+	end = stpncpy(end, filename, namelen);
+	*end = '\0';
+	
+	return ret;
 }
 
 /* check_options - check user-specified options */
@@ -417,8 +451,15 @@ void check_options ()
 			flexerror (_("could not write tables header"));
 	}
 
-	if (skelname && (skelfile = fopen (skelname, "r")) == NULL)
-		lerr (_("can't open skeleton file %s"), skelname);
+	if (skelname && (skelfile = fopen (skelname, "r")) == NULL) {
+		char *extended_name = pkgdatadir(skelname);
+		if ((skelfile = fopen (extended_name, "r")) == NULL) {
+			lerr (_("can't open skeleton file %s"), skelname);
+		}
+		
+		if( extended_name )
+			free(extended_name);
+	}
 
 	if (reentrant) {
         buf_m4_define (&m4defs_buf, "M4_YY_REENTRANT", NULL);
