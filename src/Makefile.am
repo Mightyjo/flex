@@ -64,15 +64,21 @@ include_HEADERS = \
 EXTRA_DIST = \
 	flex.skl \
 	default.skl \
+	c.skl \
+	cc.skl \
 	mkskel.sh \
 	gettext.h
 
 pkgdata_DATA = \
-	default.skl
+	default.skl \
+	flex.c.skl \
+	flex.cc.skl
 
 BUILT_SOURCES = \
 	configmake.h \
 	default.skl \
+	flex.c.skl \
+	flex.cc.skl \
 	skel.c
 
 skel.c: default.skl mkskel.sh flexint.h tables_shared.h
@@ -80,6 +86,12 @@ skel.c: default.skl mkskel.sh flexint.h tables_shared.h
 
 default.skl: flex.skl mkskel.sh flexint.h tables_shared.h
 	sed 's/m4_/m4postproc_/g; s/m4preproc_/m4_/g' $(srcdir)/flex.skl | $(m4) -P -DFLEX_MAJOR_VERSION=`echo $(VERSION)|cut -f 1 -d .` -DFLEX_MINOR_VERSION=`echo $(VERSION)|cut -f 2 -d .` -DFLEX_SUBMINOR_VERSION=`echo $(VERSION)|cut -f 3 -d .` | sed 's/m4postproc_/m4_/g' > $@
+
+flex.c.skl: c.skl mkskel.sh flexint.h tables_shared.h
+	sed 's/m4_/m4postproc_/g; s/m4preproc_/m4_/g' $(srcdir)/c.skl | $(m4) -P -DFLEX_MAJOR_VERSION=`echo $(VERSION)|cut -f 1 -d .` -DFLEX_MINOR_VERSION=`echo $(VERSION)|cut -f 2 -d .` -DFLEX_SUBMINOR_VERSION=`echo $(VERSION)|cut -f 3 -d .` | sed 's/m4postproc_/m4_/g' > $@
+
+flex.cc.skl: cc.skl mkskel.sh flexint.h tables_shared.h
+	sed 's/m4_/m4postproc_/g; s/m4preproc_/m4_/g' $(srcdir)/cc.skl | $(m4) -P -DFLEX_MAJOR_VERSION=`echo $(VERSION)|cut -f 1 -d .` -DFLEX_MINOR_VERSION=`echo $(VERSION)|cut -f 2 -d .` -DFLEX_SUBMINOR_VERSION=`echo $(VERSION)|cut -f 3 -d .` | sed 's/m4postproc_/m4_/g' > $@
 
 # Cribbed from gnulib-tool output
 configmake.h: Makefile
