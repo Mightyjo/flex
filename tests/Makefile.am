@@ -71,6 +71,7 @@ simple_tests = \
 	ccl \
 	cxx_basic \
 	cxx_multiple_scanners \
+	cxx_skel \
 	debug_nr \
 	debug_r \
 	extended \
@@ -135,6 +136,7 @@ c_cxx_r_SOURCES = c_cxx_r.lll
 ccl_SOURCES = ccl.l
 cxx_basic_SOURCES = cxx_basic.ll
 cxx_multiple_scanners_SOURCES = cxx_multiple_scanners_main.cc cxx_multiple_scanners_1.ll cxx_multiple_scanners_2.ll
+cxx_skel_SOURCES = cxx_skel.ll
 cxx_yywrap_i3_SOURCES = cxx_yywrap.ll
 debug_nr_SOURCES = debug_nr.l
 debug_r_SOURCES = debug_r.l
@@ -181,6 +183,7 @@ BUILT_SOURCES = \
 	bison_yylval_scanner.h \
 	c_cxx_nr.cc \
 	c_cxx_r.cc \
+	cxx_skel.cc \
 	header_nr_scanner.h \
 	header_r_scanner.h \
 	multiple_scanners_nr_1.h \
@@ -217,6 +220,7 @@ basic_nr.txt \
 	ccl.txt \
 	cxx_basic.txt \
 	cxx_multiple_scanners.txt \
+	cxx_skel.txt \
 	cxx_yywrap.txt \
 	debug_nr.txt \
 	debug_r.txt \
