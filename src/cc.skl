@@ -27,7 +27,7 @@ m4preproc_changecom
 %# Macros for runtime processing stage.
 m4_changecom
 m4_changequote
-m4_changequote([[, ]])
+m4_changequote(`[[', `]]')
 
 %# 
 %# Lines in this skeleton starting with a "%" character are "control lines"
@@ -79,21 +79,18 @@ m4_ifdef( [[M4_YY_REENTRANT]],  [[m4_define([[M4_YY_HAS_START_STACK_VARS]])]])
 %# the argument lists to each C function.
 
 
-m4_ifdef( [[M4_YY_PREFIX]],, [[m4_define([[M4_YY_PREFIX]], [[yy]])]])
+%# m4_ifdef( [[M4_YY_PREFIX]],, [[m4_define([[M4_YY_PREFIX]], [[yy]])]])
 
 m4preproc_define(`M4_GEN_PREFIX',
     ``m4_define(yy[[$1]], [[M4_YY_PREFIX[[$1]]m4_ifelse($'`#,0,,[[($'`@)]])]])'')
 
-%if-c++-only
-    /* The c++ scanner is a mess. The FlexLexer.h header file relies on the
-     * following macro. This is required in order to pass the c++-multiple-scanners
-     * test in the regression suite. We get reports that it breaks inheritance.
-     * We will address this in a future release of flex, or omit the C++ scanner
-     * altogether.
-     */
-    #define yyFlexLexer M4_YY_PREFIX[[FlexLexer]]
-%endif
-
+/* The c++ scanner is a mess. The FlexLexer.h header file relies on the
+ * following macro. This is required in order to pass the c++-multiple-scanners
+ * test in the regression suite. We get reports that it breaks inheritance.
+ * We will address this in a future release of flex, or omit the C++ scanner
+ * altogether.
+ */
+#define yyFlexLexer M4_YY_PREFIX[[FlexLexer]]
 
 
 m4_ifdef( [[M4_YY_BISON_LVAL]],
@@ -134,11 +131,8 @@ m4_ifdef( [[M4_YY_TABLES_EXTERNAL]],
 %endif
 /* end standard C headers. */
 
-%if-c-or-c++
 m4preproc_include(`flexint.h')
-%endif
 
-%if-c++-only
 /* begin standard C++ headers. */
 #include <iostream> 
 #include <errno.h>
@@ -146,28 +140,10 @@ m4preproc_include(`flexint.h')
 #include <cstdio>
 #include <cstring>
 /* end standard C++ headers. */
-%endif
-
-#ifdef __cplusplus
 
 /* The "const" storage-class-modifier is valid. */
 #define YY_USE_CONST
-
-#else	/* ! __cplusplus */
-
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
-
-#define YY_USE_CONST
-
-#endif	/* defined (__STDC__) */
-#endif	/* ! __cplusplus */
-
-#ifdef YY_USE_CONST
 #define yyconst const
-#else
-#define yyconst
-#endif
 
 %# For compilers that can not handle prototypes.
 %# e.g.,
@@ -202,68 +178,6 @@ m4_ifdef( [[M4_YY_NO_ANSI_FUNC_PROTOS]],
 #define YY_SC_TO_UI(c) ((unsigned int) (unsigned char) c)
 %ok-for-header
 
-
-
-%if-reentrant
-
-/* An opaque pointer. */
-#ifndef YY_TYPEDEF_YY_SCANNER_T
-#define YY_TYPEDEF_YY_SCANNER_T
-typedef void* yyscan_t;
-#endif
-
-%# Declare yyguts variable
-m4_define( [[M4_YY_DECL_GUTS_VAR]], [[struct yyguts_t * yyg = (struct yyguts_t*)yyscanner]])
-%# Perform a noop access on yyguts to prevent unused variable complains
-m4_define( [[M4_YY_NOOP_GUTS_VAR]], [[(void)yyg]])
-%# For use wherever a Global is accessed or assigned.
-m4_define( [[YY_G]], [[yyg->$1]])
-
-%# For use in function prototypes to append the additional argument.
-m4_define( [[M4_YY_PROTO_LAST_ARG]],  [[, yyscan_t yyscanner]])
-m4_define( [[M4_YY_PROTO_ONLY_ARG]],  [[yyscan_t yyscanner]])
-
-%# For use in function definitions to append the additional argument.
-m4_ifdef( [[M4_YY_NO_ANSI_FUNC_DEFS]],
-[[
-    m4_define( [[M4_YY_DEF_LAST_ARG]], [[, yyscanner]])
-    m4_define( [[M4_YY_DEF_ONLY_ARG]], [[yyscanner]])
-]],
-[[
-    m4_define( [[M4_YY_DEF_LAST_ARG]],  [[, yyscan_t yyscanner]])
-    m4_define( [[M4_YY_DEF_ONLY_ARG]],  [[yyscan_t yyscanner]])
-]])
-m4_define( [[M4_YY_DECL_LAST_ARG]],  [[yyscan_t yyscanner;]])
-
-%# For use in function calls to pass the additional argument.
-m4_define( [[M4_YY_CALL_LAST_ARG]], [[, yyscanner]])
-m4_define( [[M4_YY_CALL_ONLY_ARG]], [[yyscanner]])
-
-%# For use in function documentation to adjust for additional argument.
-m4_define( [[M4_YY_DOC_PARAM]], [[@param yyscanner The scanner object.]])
-
-/* For convenience, these vars (plus the bison vars far below)
-   are macros in the reentrant scanner. */
-#define yyin YY_G(yyin_r)
-#define yyout YY_G(yyout_r)
-#define yyextra YY_G(yyextra_r)
-#define yyleng YY_G(yyleng_r)
-#define yytext YY_G(yytext_r)
-#define yylineno (YY_CURRENT_BUFFER_LVALUE->yy_bs_lineno)
-#define yycolumn (YY_CURRENT_BUFFER_LVALUE->yy_bs_column)
-#define yy_flex_debug YY_G(yy_flex_debug_r)
-
-m4_define( [[M4_YY_INCR_LINENO]],
-[[   
-    do{ yylineno++;
-        yycolumn=0;
-    }while(0)
-]])
-
-%endif
-
-
-
 %if-not-reentrant
 
 m4_define( [[M4_YY_INCR_LINENO]],
@@ -296,35 +210,10 @@ m4_define( [[M4_YY_DOC_PARAM]], [[]])
 
 m4_ifdef( [[M4_YY_NO_ANSI_FUNC_DEFS]],
 [[
-%# For compilers that need traditional function definitions.
-%# e.g.,
-%# The function prototype taking 2 arguments
-%#    int foo (int x, char* y)
-%#
-%# ...should be written as
-%#    int foo YYFARGS2(int,x, char*,y)
-%#
-%# ...which could possibly generate
-%#    int foo (x,y,yyscanner)
-%#        int x;
-%#        char * y;
-%#        yyscan_t yyscanner;
-%#
-%# Generate traditional function defs
-    m4_define( [[YYFARGS0]], [[(M4_YY_DEF_ONLY_ARG) [[\]]
-        M4_YY_DECL_LAST_ARG]])
-    m4_define( [[YYFARGS1]], [[($2 M4_YY_DEF_LAST_ARG) [[\]]
-        $1 $2; [[\]]
-        M4_YY_DECL_LAST_ARG]])
-    m4_define( [[YYFARGS2]], [[($2,$4 M4_YY_DEF_LAST_ARG) [[\]]
-        $1 $2; [[\]]
-        $3 $4; [[\]]
-        M4_YY_DECL_LAST_ARG]])
-    m4_define( [[YYFARGS3]], [[($2,$4,$6 M4_YY_DEF_LAST_ARG) [[\]]
-        $1 $2; [[\]]
-        $3 $4; [[\]]
-        $5 $6; [[\]]
-        M4_YY_DECL_LAST_ARG]])
+%# JOE 
+%# This option is incompatible with C++
+%# Should we warn or expect that anyone using this skel knows that?
+%# lerr(somethingsomething)...?
 ]],
 [[
 %# Generate C99 function defs.
@@ -334,6 +223,7 @@ m4_ifdef( [[M4_YY_NO_ANSI_FUNC_DEFS]],
     m4_define( [[YYFARGS3]], [[($1 $2, $3 $4, $5 $6 M4_YY_DEF_LAST_ARG)]])
 ]])
 
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 /* Enter a start condition.  This macro really ought to take a parameter,
@@ -369,6 +259,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 #define YY_END_OF_BUFFER_CHAR 0
 ]])
+%ok-for-header
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
@@ -383,13 +274,14 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #endif /* __ia64__ */
 #endif
 
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 /* The state buf must be large enough to hold one state per character in the main buffer.
  */
 #define YY_STATE_BUF_SIZE   ((YY_BUF_SIZE + 2) * sizeof(yy_state_type))
 ]])
-
+%ok-for-header
 
 #ifndef YY_TYPEDEF_YY_BUFFER_STATE
 #define YY_TYPEDEF_YY_BUFFER_STATE
@@ -401,12 +293,10 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 typedef size_t yy_size_t;
 #endif
 
-%if-not-reentrant
 extern yy_size_t yyleng;
-%endif
 
 
-
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 #define EOB_ACT_CONTINUE_SCAN 0
@@ -467,17 +357,13 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 #define unput(c) yyunput( c, YY_G(yytext_ptr) M4_YY_CALL_LAST_ARG )
 ]])
+%ok-for-header
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
-	{
-
-
-%if-c++-only
+{
 	std::istream* yy_input_file;
-%endif
-
 
 	char *yy_ch_buf;		/* input buffer */
 	char *yy_buf_pos;		/* current position in input buffer */
@@ -521,8 +407,7 @@ struct yy_buffer_state
 	int yy_fill_buffer;
 
 	int yy_buffer_status;
-m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
-[[
+};
 #define YY_BUFFER_NEW 0
 #define YY_BUFFER_NORMAL 1
 	/* When an EOF's been seen but there's still some text to process
@@ -536,12 +421,11 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 	 * just pointing yyin at a new input file.
 	 */
 #define YY_BUFFER_EOF_PENDING 2
-]])
-	};
+
 #endif /* !YY_STRUCT_YY_BUFFER_STATE */
 
 
-
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 /* We provide macros for accessing buffer states in case in the
@@ -562,13 +446,14 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
  */
 #define YY_CURRENT_BUFFER_LVALUE YY_G(yy_buffer_stack)[YY_G(yy_buffer_stack_top)]
 ]])
+%ok-for-header
 
-
-
+%# Non-class method declarations for input buffer memory management.
 void *yyalloc M4_YY_PARAMS( yy_size_t M4_YY_PROTO_LAST_ARG );
 void *yyrealloc M4_YY_PARAMS( void *, yy_size_t M4_YY_PROTO_LAST_ARG );
 void yyfree M4_YY_PARAMS( void * M4_YY_PROTO_LAST_ARG );
 
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 #define yy_new_buffer yy_create_buffer
@@ -604,15 +489,14 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 ]])
-
+%# JOE
+%# %ok-for-header
 %% [1.0] yytext/yyin/yyout/yy_state_type/yylineno etc. def's & init go here
-
+%# %not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 %% [1.5] DFA
 ]])
-
-
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
@@ -633,6 +517,8 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 %% [4.0] data tables for the DFA and the user's section 1 definitions go here
 ]])
 
+%ok-for-header
+
 m4_ifdef( [[M4_YY_IN_HEADER]], [[#ifdef YY_HEADER_EXPORT_START_CONDITIONS]])
 M4_YY_SC_DEFS
 m4_ifdef( [[M4_YY_IN_HEADER]], [[#endif]])
@@ -645,12 +531,11 @@ m4_ifdef( [[M4_YY_NO_UNISTD_H]],,
  * The user has a chance to override it with an option.
  */
 
-%if-c++-only
 #include <unistd.h>
-%endif
 #endif
 ]])
 
+%# JOE Think this is only valid for C reentrant scanners
 m4_ifdef( [[M4_EXTRA_TYPE_DEFS]],
 [[
 #define YY_EXTRA_TYPE M4_EXTRA_TYPE_DEFS
@@ -689,14 +574,12 @@ static int yy_flex_strlen M4_YY_PARAMS( yyconst char * M4_YY_PROTO_LAST_ARG);
 #endif /* __ia64__ */
 #endif
 
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 /* Copy whatever the last rule matched to the standard output. */
 #ifndef ECHO
-
-%if-c++-only C++ definition
 #define ECHO LexerOutput( yytext, yyleng )
-%endif
 #endif
 ]])
 
@@ -709,11 +592,8 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_INPUT(buf,result,max_size) \
 %% [5.0] fread()/read() definition of YY_INPUT goes here unless we're doing C++ \
 \
-%if-c++-only C++ definition \
 	if ( (int)(result = LexerInput( (char *) buf, max_size )) < 0 ) \
 		YY_FATAL_ERROR( "input in flex scanner failed" );
-%endif
-
 #endif
 ]])
 
@@ -727,22 +607,22 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define yyterminate() return YY_NULL
 #endif
 ]])
+%ok-for-header
 
 /* Number of entries by which start-condition stack grows. */
 #ifndef YY_START_STACK_INCR
 #define YY_START_STACK_INCR 25
 #endif
 
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 /* Report a fatal error. */
 #ifndef YY_FATAL_ERROR
-
-%if-c++-only
 #define YY_FATAL_ERROR(msg) LexerError( msg )
-%endif
 #endif
 ]])
+%ok-for-header
 
 %if-tables-serialization structures and prototypes
 m4preproc_include(`tables_shared.h')
@@ -787,12 +667,102 @@ struct yytbl_reader {
  */
 #ifndef YY_DECL
 #define YY_DECL_IS_OURS 1
-
-%if-c++-only C++ definition
 #define YY_DECL int yyFlexLexer::yylex()
-%endif
 #endif /* !YY_DECL */
 
+class yyFlexLexer : public FlexLexer {
+public:
+	// arg_yyin and arg_yyout default to the cin and cout, but we
+	// only make that assignment when initializing in yylex().
+	yyFlexLexer( FLEX_STD istream* arg_yyin = 0, FLEX_STD ostream* arg_yyout = 0 );
+
+	virtual ~yyFlexLexer();
+
+	void yy_switch_to_buffer( struct yy_buffer_state* new_buffer );
+	struct yy_buffer_state* yy_create_buffer( FLEX_STD istream* s, int size );
+	void yy_delete_buffer( struct yy_buffer_state* b );
+	void yyrestart( FLEX_STD istream* s );
+
+	void yypush_buffer_state( struct yy_buffer_state* new_buffer );
+	void yypop_buffer_state();
+
+	virtual int yylex();
+	virtual void switch_streams( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0 );
+	virtual int yywrap();
+
+protected:
+	virtual int LexerInput( char* buf, int max_size );
+	virtual void LexerOutput( const char* buf, int size );
+	virtual void LexerError( const char* msg );
+
+	void yyunput( int c, char* buf_ptr );
+	int yyinput();
+
+	void yy_load_buffer_state();
+	void yy_init_buffer( struct yy_buffer_state* b, FLEX_STD istream* s );
+	void yy_flush_buffer( struct yy_buffer_state* b );
+
+	int yy_start_stack_ptr;
+	int yy_start_stack_depth;
+	int* yy_start_stack;
+
+	void yy_push_state( int new_state );
+	void yy_pop_state();
+	int yy_top_state();
+
+	yy_state_type yy_get_previous_state();
+	yy_state_type yy_try_NUL_trans( yy_state_type current_state );
+	int yy_get_next_buffer();
+
+	FLEX_STD istream* yyin;	// input source for default LexerInput
+	FLEX_STD ostream* yyout;	// output sink for default LexerOutput
+
+	// yy_hold_char holds the character lost when yytext is formed.
+	char yy_hold_char;
+
+	// Number of characters read into yy_ch_buf.
+	int yy_n_chars;
+
+	// Points to current character in buffer.
+	char* yy_c_buf_p;
+
+	int yy_init;		// whether we need to initialize
+	int yy_start;		// start state number
+
+	// Flag which is used to allow yywrap()'s to do buffer switches
+	// instead of setting up a fresh yyin.  A bit of a hack ...
+	int yy_did_buffer_switch_on_eof;
+
+
+	size_t yy_buffer_stack_top; /**< index of top of stack. */
+	size_t yy_buffer_stack_max; /**< capacity of stack. */
+	struct yy_buffer_state ** yy_buffer_stack; /**< Stack as an array. */
+	void yyensure_buffer_stack(void);
+
+	// The following are not always needed, but may be depending
+	// on use of certain flex features (like REJECT or yymore()).
+
+	yy_state_type yy_last_accepting_state;
+	char* yy_last_accepting_cpos;
+
+	yy_state_type* yy_state_buf;
+	yy_state_type* yy_state_ptr;
+
+	char* yy_full_match;
+	int* yy_full_state;
+	int yy_full_lp;
+
+	int yy_lp;
+	int yy_looking_for_trail_begin;
+
+	int yy_more_flag;
+	int yy_more_len;
+	int yy_more_offset;
+	int yy_prev_more_offset;
+};
+
+%# This is the end of material for the header until the very end
+%not-for-header
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 /* Code executed at the beginning of each rule, after yytext and yyleng
@@ -816,7 +786,6 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 %% [6.0] YY_RULE_SETUP definition goes here
 ]])
 
-%not-for-header
 /** The main scanner function which does all the work.
  */
 YY_DECL
@@ -869,16 +838,10 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 			YY_G(yy_start) = 1;	/* first start state */
 
 		if ( ! yyin )
-
-%if-c++-only
 			yyin = & std::cin;
-%endif
 
 		if ( ! yyout )
-
-%if-c++-only
 			yyout = & std::cout;
-%endif
 
 		if ( ! YY_CURRENT_BUFFER ) {
 			yyensure_buffer_stack (M4_YY_CALL_ONLY_ARG);
@@ -1051,10 +1014,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		} /* end of scanning one token */
 	} /* end of user's declarations */
 } /* end of yylex */
-%ok-for-header
 
-%if-c++-only
-%not-for-header
 /* The contents of this function are C++ specific, so the YY_G macro is not used.
  */
 yyFlexLexer::yyFlexLexer( std::istream* arg_yyin, std::ostream* arg_yyout )
@@ -1149,8 +1109,6 @@ void yyFlexLexer::LexerOutput( const char* buf, int size )
 {
 	(void) yyout->write( buf, size );
 }
-%ok-for-header
-%endif
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
@@ -1162,9 +1120,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
  *	EOB_ACT_END_OF_FILE - end of file
  */
 
-%if-c++-only
 int yyFlexLexer::yy_get_next_buffer()
-%endif
 {
     M4_YY_DECL_GUTS_VAR();
 	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
@@ -1306,11 +1262,7 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 ]])
 
 /* yy_get_previous_state - get the state just before the EOB char was reached */
-
-
-%if-c++-only
-    yy_state_type yyFlexLexer::yy_get_previous_state()
-%endif
+yy_state_type yyFlexLexer::yy_get_previous_state()
 {
 	yy_state_type yy_current_state;
 	char *yy_cp;
@@ -1332,10 +1284,7 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
  * synopsis
  *	next_state = yy_try_NUL_trans( current_state );
  */
-
-%if-c++-only
-    yy_state_type yyFlexLexer::yy_try_NUL_trans( yy_state_type yy_current_state )
-%endif
+yy_state_type yyFlexLexer::yy_try_NUL_trans( yy_state_type yy_current_state )
 {
 	int yy_is_jam;
     M4_YY_DECL_GUTS_VAR(); /* This var may be unused depending upon options. */
@@ -1347,10 +1296,8 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 
 
 #ifndef YY_NO_UNPUT
-
-%if-c++-only
-    void yyFlexLexer::yyunput( int c, char* yy_bp)
-%endif
+/* yyunput - put c characters back into the buffer yy_bp */
+void yyFlexLexer::yyunput( int c, char* yy_bp)
 {
 	char *yy_cp;
     M4_YY_DECL_GUTS_VAR();
@@ -1395,13 +1342,10 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 	YY_G(yy_hold_char) = *yy_cp;
 	YY_G(yy_c_buf_p) = yy_cp;
 }
-
 #endif
 
-
-%if-c++-only
-    int yyFlexLexer::yyinput()
-%endif
+/* yyinput - read the next character from the input buffer and refill the buffer if needed */
+int yyFlexLexer::yyinput()
 {
 	int c;
     M4_YY_DECL_GUTS_VAR();
@@ -1448,11 +1392,7 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 
 					if ( ! YY_G(yy_did_buffer_switch_on_eof) )
 						YY_NEW_FILE;
-#ifdef __cplusplus
 					return yyinput(M4_YY_CALL_ONLY_ARG);
-#else
-					return input(M4_YY_CALL_ONLY_ARG);
-#endif
 					}
 
 				case EOB_ACT_CONTINUE_SCAN:
@@ -1472,15 +1412,12 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 }
 
 
-/** Immediately switch to a different input stream.
+/** yyrestart - Immediately switch to a different input stream.
  * @param input_file A readable stream.
  * M4_YY_DOC_PARAM
  * @note This function does not reset the start condition to @c INITIAL .
  */
-
-%if-c++-only
-    void yyFlexLexer::yyrestart( std::istream* input_file )
-%endif
+void yyFlexLexer::yyrestart( std::istream* input_file )
 {
     M4_YY_DECL_GUTS_VAR();
 
@@ -1494,14 +1431,11 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 	yy_load_buffer_state( M4_YY_CALL_ONLY_ARG );
 }
 
-/** Switch to a different input buffer.
+/** yy_switch_to_buffer - Switch to a different input buffer.
  * @param new_buffer The new input buffer.
  * M4_YY_DOC_PARAM
  */
-
-%if-c++-only
-    void yyFlexLexer::yy_switch_to_buffer( YY_BUFFER_STATE new_buffer )
-%endif
+void yyFlexLexer::yy_switch_to_buffer( YY_BUFFER_STATE new_buffer )
 {
     M4_YY_DECL_GUTS_VAR();
 
@@ -1533,11 +1467,8 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 	YY_G(yy_did_buffer_switch_on_eof) = 1;
 }
 
-
-
-%if-c++-only
-    void yyFlexLexer::yy_load_buffer_state()
-%endif
+/* yy_load_buffer_state - prepare the scanner to use the current buffer */
+void yyFlexLexer::yy_load_buffer_state()
 {
     M4_YY_DECL_GUTS_VAR();
 	YY_G(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
@@ -1546,16 +1477,13 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 	YY_G(yy_hold_char) = *YY_G(yy_c_buf_p);
 }
 
-/** Allocate and initialize an input buffer state.
+/** yy_create_buffer - Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
  * M4_YY_DOC_PARAM
  * @return the allocated buffer state.
  */
-
-%if-c++-only
-    YY_BUFFER_STATE yyFlexLexer::yy_create_buffer( std::istream* file, int size )
-%endif
+YY_BUFFER_STATE yyFlexLexer::yy_create_buffer( std::istream* file, int size )
 {
 	YY_BUFFER_STATE b;
     m4_dnl M4_YY_DECL_GUTS_VAR();
@@ -1580,14 +1508,11 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 	return b;
 }
 
-/** Destroy the buffer.
+/** yy_delete_buffer - Destroy the buffer.
  * @param b a buffer created with yy_create_buffer()
  * M4_YY_DOC_PARAM
  */
-
-%if-c++-only
-    void yyFlexLexer::yy_delete_buffer( YY_BUFFER_STATE b )
-%endif
+void yyFlexLexer::yy_delete_buffer( YY_BUFFER_STATE b )
 {
     M4_YY_DECL_GUTS_VAR();
 
@@ -1604,15 +1529,11 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 }
 
 
-/* Initializes or reinitializes a buffer.
+/* yy_init_buffer - Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
  */
-
-%if-c++-only
-    void yyFlexLexer::yy_init_buffer( YY_BUFFER_STATE b, std::istream* file )
-%endif
-
+void yyFlexLexer::yy_init_buffer( YY_BUFFER_STATE b, std::istream* file )
 {
 	int oerrno = errno;
     M4_YY_DECL_GUTS_VAR();
@@ -1631,21 +1552,15 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
         b->yy_bs_column = 0;
     }
 
-
-%if-c++-only
 	b->yy_is_interactive = 0;
-%endif
 	errno = oerrno;
 }
 
-/** Discard all buffered characters. On the next scan, YY_INPUT will be called.
+/** yy_flush_buffer - Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
  * M4_YY_DOC_PARAM
  */
-
-%if-c++-only
-    void yyFlexLexer::yy_flush_buffer( YY_BUFFER_STATE b )
-%endif
+void yyFlexLexer::yy_flush_buffer( YY_BUFFER_STATE b )
 {
     M4_YY_DECL_GUTS_VAR();
 	if ( ! b )
@@ -1669,17 +1584,13 @@ m4_ifdef( [[M4_YY_USE_LINENO]],
 		yy_load_buffer_state( M4_YY_CALL_ONLY_ARG );
 }
 
-%if-c-or-c++
-/** Pushes the new state onto the stack. The new state becomes
+/** yypush_buffer_state - Pushes the new state onto the stack. The new state becomes
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
  *  M4_YY_DOC_PARAM
  */
-
-%if-c++-only
 void yyFlexLexer::yypush_buffer_state (YY_BUFFER_STATE new_buffer)
-%endif
 {
     M4_YY_DECL_GUTS_VAR();
 	if (new_buffer == NULL)
@@ -1705,18 +1616,12 @@ void yyFlexLexer::yypush_buffer_state (YY_BUFFER_STATE new_buffer)
 	yy_load_buffer_state( M4_YY_CALL_ONLY_ARG );
 	YY_G(yy_did_buffer_switch_on_eof) = 1;
 }
-%endif
 
-
-%if-c-or-c++
-/** Removes and deletes the top of the stack, if present.
+/** yypop_buffer_state - Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
  *  M4_YY_DOC_PARAM
  */
-
-%if-c++-only
 void yyFlexLexer::yypop_buffer_state (void)
-%endif
 {
     M4_YY_DECL_GUTS_VAR();
 	if (!YY_CURRENT_BUFFER)
@@ -1732,17 +1637,11 @@ void yyFlexLexer::yypop_buffer_state (void)
 		YY_G(yy_did_buffer_switch_on_eof) = 1;
 	}
 }
-%endif
 
-
-%if-c-or-c++
-/* Allocates the stack if it does not exist.
+/* yyensure_buffer_stack - Allocates the stack if it does not exist.
  *  Guarantees space for at least one push.
  */
-
-%if-c++-only
 void yyFlexLexer::yyensure_buffer_stack(void)
-%endif
 {
 	yy_size_t num_to_alloc;
     M4_YY_DECL_GUTS_VAR();
@@ -1786,10 +1685,6 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 		YY_G(yy_buffer_stack_max) = num_to_alloc;
 	}
 }
-%endif
-
-
-
 
 m4_ifdef( [[M4_YY_NO_SCAN_BUFFER]],,
 [[
@@ -1811,10 +1706,8 @@ m4_ifdef( [[M4_YY_NO_SCAN_BYTES]],,
 
 m4_ifdef( [[M4_YY_NO_PUSH_STATE]],,
 [[
-
-%if-c++-only
-    void yyFlexLexer::yy_push_state( int _new_state )
-%endif
+/* yy_push_state - push a scanner state onto the stack */
+void yyFlexLexer::yy_push_state( int _new_state )
 {
     M4_YY_DECL_GUTS_VAR();
 	if ( YY_G(yy_start_stack_ptr) >= YY_G(yy_start_stack_depth) )
@@ -1844,10 +1737,8 @@ m4_ifdef( [[M4_YY_NO_PUSH_STATE]],,
 
 m4_ifdef( [[M4_YY_NO_POP_STATE]],,
 [[
-
-%if-c++-only
-    void yyFlexLexer::yy_pop_state()
-%endif
+/* yy_pop_state - pop the top off the scanner state stack
+void yyFlexLexer::yy_pop_state()
 {
     M4_YY_DECL_GUTS_VAR();
 	if ( --YY_G(yy_start_stack_ptr) < 0 )
@@ -1860,10 +1751,8 @@ m4_ifdef( [[M4_YY_NO_POP_STATE]],,
 
 m4_ifdef( [[M4_YY_NO_TOP_STATE]],,
 [[
-
-%if-c++-only
-    int yyFlexLexer::yy_top_state()
-%endif
+/* yy_top_state - get the top of the scanner state stack
+int yyFlexLexer::yy_top_state()
 {
     M4_YY_DECL_GUTS_VAR();
 	return YY_G(yy_start_stack)[YY_G(yy_start_stack_ptr) - 1];
@@ -1874,18 +1763,14 @@ m4_ifdef( [[M4_YY_NO_TOP_STATE]],,
 #define YY_EXIT_FAILURE 2
 #endif
 
-
-%if-c++-only
 void yyFlexLexer::LexerError( yyconst char msg[] )
 {
     M4_YY_DECL_GUTS_VAR();
 	std::cerr << msg << std::endl;
 	exit( YY_EXIT_FAILURE );
 }
-%endif
 
 /* Redefine yyless() so it works in section 3 code. */
-
 #undef yyless
 #define yyless(n) \
 	do \
@@ -1900,15 +1785,6 @@ void yyFlexLexer::LexerError( yyconst char msg[] )
 		yyleng = yyless_macro_arg; \
 		} \
 	while ( 0 )
-
-
-
-
-
-
-
-
-
 
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
@@ -2385,15 +2261,17 @@ int yytables_destroy YYFARGS0(void)
 
 
 m4_ifdef([[M4_YY_MAIN]], [[
+#define yyFlexLexer M4_YY_PREFIX[[FlexLexer]]
+#include <FlexLexer2.h>
+
 int main M4_YY_PARAMS(void);
 
 int main ()
 {
 
-%# JOE Make this have C++ nature
-%if-not-reentrant
-	yylex();
-%endif
+	yyFlexLexer f;
+    f.switch_streams(&std::cin, &std::cout);
+    f.yylex();
 
 	return 0;
 }

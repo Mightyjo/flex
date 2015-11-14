@@ -1694,7 +1694,8 @@ void readin ()
 	}
 
 	if (C_plus_plus) {
-		outn ("\n#include <FlexLexer.h>");
+		if (!headerfilename)
+			outn ("\n#include <FlexLexer.h>");
 
  		if (!do_yywrap) {
 			outn("\nint yyFlexLexer::yywrap() { return 1; }");

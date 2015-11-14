@@ -29,7 +29,7 @@
 
 %option 8bit prefix="test"
 %option warn c++
-%option skel="../src/flex.cc.skl"
+%option skel="../src/flex.cc.skl" header-file="cxx_skel.h"
 %option nounput nomain noinput noyywrap 
 
 %%
@@ -37,6 +37,9 @@
 .              { }
 
 %%
+
+#define yyFlexLexer testFlexLexer
+#include "cxx_skel.h"
 
 int main(void);
 
