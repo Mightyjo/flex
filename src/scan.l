@@ -970,7 +970,7 @@ nmstr[yyleng - 2 - end_is_ws] = '\0';  /* chop trailing brace */
 %%
 
 
-int yywrap()
+int yywrap(void)
 	{
 	if ( --num_input_files > 0 )
 		{
@@ -985,8 +985,7 @@ int yywrap()
 
 /* set_input_file - open the given file (if NULL, stdin) for scanning */
 
-void set_input_file( file )
-char *file;
+void set_input_file( char *file )
 	{
 	if ( file && strcmp( file, "-" ) )
 		{
@@ -1009,21 +1008,17 @@ char *file;
 
 /* Wrapper routines for accessing the scanner's malloc routines. */
 
-void *flex_alloc( size )
-size_t size;
+void *flex_alloc( size_t size )
 	{
 	return (void *) malloc( size );
 	}
 
-void *flex_realloc( ptr, size )
-void *ptr;
-size_t size;
+void *flex_realloc( void *ptr, size_t size )
 	{
 	return (void *) realloc( ptr, size );
 	}
 
-void flex_free( ptr )
-void *ptr;
+void flex_free( void *ptr )
 	{
 	if ( ptr )
 		free( ptr );
