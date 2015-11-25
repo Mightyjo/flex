@@ -56,8 +56,6 @@ m4_changequote(`[[', `]]')
 %#
 
 
-%ok-for-header
-
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION FLEX_MAJOR_VERSION
 #define YY_FLEX_MINOR_VERSION FLEX_MINOR_VERSION
@@ -363,7 +361,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
 {
-	std::istream* yy_input_file;
+	std::streambuf* yy_input_file;
 
 	char *yy_ch_buf;		/* input buffer */
 	char *yy_buf_pos;		/* current position in input buffer */
@@ -662,6 +660,7 @@ struct yytbl_reader {
 
 %ok-for-header
 
+
 /* Default declaration of generated scanner - a define so the user can
  * easily add parameters.
  */
@@ -670,24 +669,33 @@ struct yytbl_reader {
 #define YY_DECL int yyFlexLexer::yylex()
 #endif /* !YY_DECL */
 
+m4_ifdef([[M4_YY_IN_HEADER]],[[
 class yyFlexLexer : public FlexLexer {
 public:
 	// arg_yyin and arg_yyout default to the cin and cout, but we
 	// only make that assignment when initializing in yylex().
+	yyFlexLexer( FLEX_STD istream& arg_yyin, FLEX_STD ostream& arg_yyout );
 	yyFlexLexer( FLEX_STD istream* arg_yyin = 0, FLEX_STD ostream* arg_yyout = 0 );
+private:
+	void ctor_common();
+
+public:
 
 	virtual ~yyFlexLexer();
 
 	void yy_switch_to_buffer( struct yy_buffer_state* new_buffer );
-	struct yy_buffer_state* yy_create_buffer( FLEX_STD istream* s, int size );
+	struct yy_buffer_state* yy_create_buffer( FLEX_STD istream* s, int size );	
+	struct yy_buffer_state* yy_create_buffer( FLEX_STD istream& s, int size );
 	void yy_delete_buffer( struct yy_buffer_state* b );
 	void yyrestart( FLEX_STD istream* s );
+	void yyrestart( FLEX_STD istream& s );
 
 	void yypush_buffer_state( struct yy_buffer_state* new_buffer );
 	void yypop_buffer_state();
 
 	virtual int yylex();
-	virtual void switch_streams( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0 );
+	virtual void switch_streams( FLEX_STD istream& new_in, FLEX_STD ostream& new_out );
+	virtual void switch_streams( FLEX_STD istream* new_in = 0, FLEX_STD ostream* new_out = 0 );
 	virtual int yywrap();
 
 protected:
@@ -699,7 +707,7 @@ protected:
 	int yyinput();
 
 	void yy_load_buffer_state();
-	void yy_init_buffer( struct yy_buffer_state* b, FLEX_STD istream* s );
+	void yy_init_buffer( struct yy_buffer_state* b, FLEX_STD istream& s );
 	void yy_flush_buffer( struct yy_buffer_state* b );
 
 	int yy_start_stack_ptr;
@@ -714,8 +722,8 @@ protected:
 	yy_state_type yy_try_NUL_trans( yy_state_type current_state );
 	int yy_get_next_buffer();
 
-	FLEX_STD istream* yyin;	// input source for default LexerInput
-	FLEX_STD ostream* yyout;	// output sink for default LexerOutput
+	FLEX_STD istream yyin;	// input source for default LexerInput
+	FLEX_STD ostream yyout;	// output sink for default LexerOutput
 
 	// yy_hold_char holds the character lost when yytext is formed.
 	char yy_hold_char;
@@ -760,6 +768,7 @@ protected:
 	int yy_more_offset;
 	int yy_prev_more_offset;
 };
+]])
 
 %# This is the end of material for the header until the very end
 %not-for-header
@@ -838,10 +847,10 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 			YY_G(yy_start) = 1;	/* first start state */
 
 		if ( ! yyin )
-			yyin = & std::cin;
+			yyin.rdbuf(std::cin.rdbuf());
 
 		if ( ! yyout )
-			yyout = & std::cout;
+			yyout.rdbuf(std::cout.rdbuf());
 
 		if ( ! YY_CURRENT_BUFFER ) {
 			yyensure_buffer_stack (M4_YY_CALL_ONLY_ARG);
@@ -906,7 +915,7 @@ do_action:	/* This label is used only to access EOF actions. */
 			 * back-up) that will match for the new input source.
 			 */
 			YY_G(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
-			YY_CURRENT_BUFFER_LVALUE->yy_input_file = yyin;
+			YY_CURRENT_BUFFER_LVALUE->yy_input_file = yyin.rdbuf();
 			YY_CURRENT_BUFFER_LVALUE->yy_buffer_status = YY_BUFFER_NORMAL;
 			}
 
@@ -1016,11 +1025,29 @@ do_action:	/* This label is used only to access EOF actions. */
 } /* end of yylex */
 
 /* The contents of this function are C++ specific, so the YY_G macro is not used.
+ * This constructor simply maintains backward compatibility.
+ * DEPRECATED
  */
-yyFlexLexer::yyFlexLexer( std::istream* arg_yyin, std::ostream* arg_yyout )
+yyFlexLexer::yyFlexLexer( FLEX_STD istream* arg_yyin, FLEX_STD ostream* arg_yyout ):
+	yyin(arg_yyin ? arg_yyin->rdbuf() : std::cin.rdbuf()),
+	yyout(arg_yyout ? arg_yyout->rdbuf() : std::cout.rdbuf())
 {
-	yyin = arg_yyin;
-	yyout = arg_yyout;
+	ctor_common();
+}
+
+/* The contents of this function are C++ specific, so the YY_G macro is not used.
+ */
+yyFlexLexer::yyFlexLexer( std::istream& arg_yyin, std::ostream& arg_yyout ):
+	yyin(arg_yyin.rdbuf()),
+	yyout(arg_yyout.rdbuf())
+{
+	ctor_common();
+}
+
+/* The contents of this function are C++ specific, so the YY_G macro is not used.
+ */
+void yyFlexLexer::ctor_common()
+{
 	yy_c_buf_p = 0;
 	yy_init = 0;
 	yy_start = 0;
@@ -1063,16 +1090,29 @@ yyFlexLexer::~yyFlexLexer()
 
 /* The contents of this function are C++ specific, so the YY_G macro is not used.
  */
+void yyFlexLexer::switch_streams( std::istream& new_in, std::ostream& new_out )
+{
+	// was if( new_in )
+	yy_delete_buffer( YY_CURRENT_BUFFER M4_YY_CALL_LAST_ARG);
+	yy_switch_to_buffer( yy_create_buffer( new_in, YY_BUF_SIZE  M4_YY_CALL_LAST_ARG) M4_YY_CALL_LAST_ARG);
+
+	// was if( new_out )
+	yyout.rdbuf(new_out.rdbuf());
+}
+
+/* The contents of this function are C++ specific, so the YY_G macro is not used.
+ */
 void yyFlexLexer::switch_streams( std::istream* new_in, std::ostream* new_out )
 {
-	if ( new_in )
-		{
-		yy_delete_buffer( YY_CURRENT_BUFFER M4_YY_CALL_LAST_ARG);
-		yy_switch_to_buffer( yy_create_buffer( new_in, YY_BUF_SIZE  M4_YY_CALL_LAST_ARG) M4_YY_CALL_LAST_ARG);
-		}
+	if( ! new_in ) {
+		new_in = &yyin;
+	}
 
-	if ( new_out )
-		yyout = new_out;
+	if ( ! new_out ) {
+		new_out = &yyout;
+	}
+
+	switch_streams(*new_in, *new_out);
 }
 
 #ifdef YY_INTERACTIVE
@@ -1081,33 +1121,33 @@ int yyFlexLexer::LexerInput( char* buf, int /* max_size */ )
 int yyFlexLexer::LexerInput( char* buf, int max_size )
 #endif
 {
-	if ( yyin->eof() || yyin->fail() )
+	if ( yyin.eof() || yyin.fail() )
 		return 0;
 
 #ifdef YY_INTERACTIVE
-	yyin->get( buf[0] );
+	yyin.get( buf[0] );
 
-	if ( yyin->eof() )
+	if ( yyin.eof() )
 		return 0;
 
-	if ( yyin->bad() )
+	if ( yyin.bad() )
 		return -1;
 
 	return 1;
 
 #else
-	(void) yyin->read( buf, max_size );
+	(void) yyin.read( buf, max_size );
 
-	if ( yyin->bad() )
+	if ( yyin.bad() )
 		return -1;
 	else
-		return yyin->gcount();
+		return yyin.gcount();
 #endif
 }
 
 void yyFlexLexer::LexerOutput( const char* buf, int size )
 {
-	(void) yyout->write( buf, size );
+	(void) yyout.write( buf, size );
 }
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
@@ -1417,7 +1457,7 @@ int yyFlexLexer::yyinput()
  * M4_YY_DOC_PARAM
  * @note This function does not reset the start condition to @c INITIAL .
  */
-void yyFlexLexer::yyrestart( std::istream* input_file )
+void yyFlexLexer::yyrestart( std::istream& input_file )
 {
     M4_YY_DECL_GUTS_VAR();
 
@@ -1429,6 +1469,16 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
 
 	yy_init_buffer( YY_CURRENT_BUFFER, input_file M4_YY_CALL_LAST_ARG);
 	yy_load_buffer_state( M4_YY_CALL_ONLY_ARG );
+}
+
+/** Delegate to the new version that takes an istream reference.
+ * @param input_file A readable stream.
+ * M4_YY_DOC_PARAM
+ * @note This function does not reset the start condition to @c INITIAL .
+ */
+void yyFlexLexer::yyrestart( std::istream* input_file )
+{
+	yyrestart( *input_file );
 }
 
 /** yy_switch_to_buffer - Switch to a different input buffer.
@@ -1473,7 +1523,7 @@ void yyFlexLexer::yy_load_buffer_state()
     M4_YY_DECL_GUTS_VAR();
 	YY_G(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
 	YY_G(yytext_ptr) = YY_G(yy_c_buf_p) = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
-	yyin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
+	yyin.rdbuf(YY_CURRENT_BUFFER_LVALUE->yy_input_file);
 	YY_G(yy_hold_char) = *YY_G(yy_c_buf_p);
 }
 
@@ -1483,7 +1533,7 @@ void yyFlexLexer::yy_load_buffer_state()
  * M4_YY_DOC_PARAM
  * @return the allocated buffer state.
  */
-YY_BUFFER_STATE yyFlexLexer::yy_create_buffer( std::istream* file, int size )
+YY_BUFFER_STATE yyFlexLexer::yy_create_buffer( std::istream& file, int size )
 {
 	YY_BUFFER_STATE b;
     m4_dnl M4_YY_DECL_GUTS_VAR();
@@ -1506,6 +1556,17 @@ YY_BUFFER_STATE yyFlexLexer::yy_create_buffer( std::istream* file, int size )
 	yy_init_buffer( b, file M4_YY_CALL_LAST_ARG);
 
 	return b;
+}
+
+/** Delegate creation of buffers to the new version that takes an istream reference.
+ * @param file A readable stream.
+ * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
+ * M4_YY_DOC_PARAM
+ * @return the allocated buffer state.
+ */
+	YY_BUFFER_STATE yyFlexLexer::yy_create_buffer( std::istream* file, int size )
+{
+	return yy_create_buffer( *file, size );
 }
 
 /** yy_delete_buffer - Destroy the buffer.
@@ -1533,14 +1594,14 @@ void yyFlexLexer::yy_delete_buffer( YY_BUFFER_STATE b )
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
  */
-void yyFlexLexer::yy_init_buffer( YY_BUFFER_STATE b, std::istream* file )
+void yyFlexLexer::yy_init_buffer( YY_BUFFER_STATE b, std::istream& file )
 {
 	int oerrno = errno;
     M4_YY_DECL_GUTS_VAR();
 
 	yy_flush_buffer( b M4_YY_CALL_LAST_ARG);
 
-	b->yy_input_file = file;
+	b->yy_input_file = file.rdbuf();
 	b->yy_fill_buffer = 1;
 
     /* If b is the current buffer, then yy_init_buffer was _probably_
@@ -1737,7 +1798,7 @@ void yyFlexLexer::yy_push_state( int _new_state )
 
 m4_ifdef( [[M4_YY_NO_POP_STATE]],,
 [[
-/* yy_pop_state - pop the top off the scanner state stack
+/* yy_pop_state - pop the top off the scanner state stack */
 void yyFlexLexer::yy_pop_state()
 {
     M4_YY_DECL_GUTS_VAR();
@@ -1751,7 +1812,7 @@ void yyFlexLexer::yy_pop_state()
 
 m4_ifdef( [[M4_YY_NO_TOP_STATE]],,
 [[
-/* yy_top_state - get the top of the scanner state stack
+/* yy_top_state - get the top of the scanner state stack */
 int yyFlexLexer::yy_top_state()
 {
     M4_YY_DECL_GUTS_VAR();

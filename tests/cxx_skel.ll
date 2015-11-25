@@ -38,7 +38,7 @@
 
 %%
 
-#define yyFlexLexer testFlexLexer
+
 #include "cxx_skel.h"
 
 int main(void);

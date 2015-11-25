@@ -69,22 +69,33 @@ public:
 		yy_switch_to_buffer( struct yy_buffer_state* new_buffer ) = 0;
 	virtual struct yy_buffer_state*
 		yy_create_buffer( FLEX_STD istream* s, int size ) = 0;
+	virtual struct yy_buffer_state*
+		yy_create_buffer( FLEX_STD istream& s, int size ) = 0;
 	virtual void yy_delete_buffer( struct yy_buffer_state* b ) = 0;
-	virtual void yyrestart( FLEX_STD istream* s ) = 0;
+	virtual void yyrestart( FLEX_STD istream* s ) = 0;	
+	virtual void yyrestart( FLEX_STD istream& s ) = 0;
 
 	virtual int yylex() = 0;
 
 	// Call yylex with new input/output sources.
-	int yylex( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0 )
-		{
+	int yylex( FLEX_STD istream& new_in, FLEX_STD ostream& new_out )
+	{
 		switch_streams( new_in, new_out );
 		return yylex();
-		}
+	}
+	
+	int yylex( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0)
+	{
+		switch_streams( new_in, new_out );
+		return yylex();
+	}
 
 	// Switch to new input/output streams.  A nil stream pointer
 	// indicates "keep the current one".
-	virtual void switch_streams( FLEX_STD istream* new_in = 0,
-					FLEX_STD ostream* new_out = 0 ) = 0;
+	virtual void switch_streams( FLEX_STD istream* new_in,
+					FLEX_STD ostream* new_out ) = 0;
+	virtual void switch_streams( FLEX_STD istream& new_in,
+					FLEX_STD ostream& new_out ) = 0;
 
 	int lineno() const		{ return yylineno; }
 
