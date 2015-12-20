@@ -61,6 +61,11 @@ m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK, [[]])
 %#   Emit any user-defined constants from the input or command line.
 m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF, [[]])
 
+m4_ifdef([[M4_YY_LONG_ALIGNED]],
+#define YY_INT_ALIGNED long int,
+#define YY_INT_ALIGNED short int
+)
+
 %not-for-header
 %if-c-only
 %if-not-reentrant
