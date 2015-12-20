@@ -56,6 +56,12 @@ m4_changequote([[, ]])
 %#   edit the skeleton.
 %#
 
+%#   Emit the user-defined top block from the input.
+m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK, [[]])
+
+%#   Emit any user-defined constants from the input or command line.
+m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF, [[]])
+
 %not-for-header
 %if-c-only
 %if-not-reentrant
