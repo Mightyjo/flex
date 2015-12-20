@@ -459,22 +459,32 @@ void check_options (void)
         buf_destroy(&tmpbuf);
     }
 
-    /* This is where we begin writing to the file. */
+    /* Put the %top code into an M4 variable. */
+    if( top_buf.elts) {
+        /* outn((char*) top_buf.elts); */
+        buf_m4_define(&m4defs_buf, "M4_YY_TOP_BLOCK", top_buf.elts);
+        buf_destroy(&top_buf);
+		buf_init(&top_buf, sizeof(char));
+    }
 
-    /* Dump the %top code. */
-    if( top_buf.elts)
-        outn((char*) top_buf.elts);
+    /* Put the user defined preproc directives into an M4 variable. */
+    if (userdef_buf.elts) {
+        /* outn ((char *) (userdef_buf.elts)); */
+        buf_m4_define(&m4defs_buf, "M4_YY_USERDEF", userdef_buf.elts);
+        buf_destroy(&userdef_buf);
+		buf_init(&userdef_buf, sizeof(char));
+    }
+
+    /* This is where we begin writing to the file. */
 
     /* Dump the m4 definitions. */
     buf_print_strings(&m4defs_buf, stdout);
-    m4defs_buf.nelts = 0; /* memory leak here. */
+    /* m4defs_buf.nelts = 0; */ /* memory leak here. */
+    buf_destroy(&m4defs_buf);
+	buf_init(&m4defs_buf, sizeof(char *));
 
-    /* Place a bogus line directive, it will be fixed in the filter. */
-    outn("#line 0 \"M4_YY_OUTFILE_NAME\"\n");
-
-	/* Dump the user defined preproc directives. */
-	if (userdef_buf.elts)
-		outn ((char *) (userdef_buf.elts));
+	/* Don't emit a bogus line directive since we aren't emitting code anymore. */
+    /* outn("#line 0 \"M4_YY_OUTFILE_NAME\"\n"); */
 
 	skelout ();
 	/* %% [1.0] */
