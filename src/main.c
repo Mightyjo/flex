@@ -36,15 +36,15 @@
 #include "version.h"
 #include "options.h"
 #include "tables.h"
+#include "parse.h"
 
 static char flex_version[] = FLEX_VERSION;
 
 /* declare functions that have forward references */
 
-void flexinit PROTO ((int, char **));
-void readin PROTO ((void));
-void set_up_initial_allocations PROTO ((void));
-static char *basename2 PROTO ((char *path, int should_strip_ext));
+void flexinit(int, char **);
+void readin(void);
+void set_up_initial_allocations(void);
 
 
 /* these globals are all defined and commented in flexdef.h */
@@ -117,19 +117,9 @@ struct yytbl_writer tableswr;
  */
 char   *program_name = "flex";
 
-#ifndef SHORT_FILE_NAMES
 static const char outfile_template[] = "lex.%s.%s";
 static const char backing_name[] = "lex.backup";
 static const char tablesfile_template[] = "lex.%s.tables";
-#else
-static const char outfile_template[] = "lex%s.%s";
-static const char backing_name[] = "lex.bck";
-static const char tablesfile_template[] = "lex%s.tbl";
-#endif
-
-#ifdef MS_DOS
-extern unsigned _stklen = 16384;
-#endif
 
 /* From scan.l */
 extern FILE* yyout;
@@ -144,8 +134,7 @@ const char *escaped_qend   = "[[]]M4_YY_NOOP]M4_YY_NOOP]M4_YY_NOOP[[]]";
 /* For debugging. The max number of filters to apply to skeleton. */
 static int preproc_level = 1000;
 
-int flex_main PROTO ((int argc, char *argv[]));
-int main PROTO ((int argc, char *argv[]));
+int flex_main (int argc, char *argv[]);
 
 int flex_main (int argc, char *argv[])
 {
@@ -359,8 +348,46 @@ void check_options (void)
 
     /* Setup the filter chain. */
     output_chain = filter_create_int(NULL, filter_tee_header, headerfilename);
-    if ( !(m4 = getenv("M4")))
-        m4 = M4;
+    if ( !(m4 = getenv("M4"))) {
+	    char *slash;
+		m4 = M4;
+		if ((slash = strrchr(M4, '/')) != NULL) {
+			m4 = slash+1;
+			/* break up $PATH */
+			const char *path = getenv("PATH");
+			if (!path) {
+				m4 = M4;
+			} else {
+				do {
+					char m4_path[PATH_MAX];
+					size_t length = strlen(path);
+					struct stat sbuf;
+
+					const char *endOfDir = strchr(path, ':');
+					if (!endOfDir)
+						endOfDir = path+length;
+
+					if (endOfDir + 2 >= path + sizeof(m4_path)) {
+					    path = endOfDir+1;
+						continue;
+					}
+
+					strncpy(m4_path, path, sizeof(m4_path));
+					m4_path[endOfDir-path] = '/';
+					m4_path[endOfDir-path+1] = '\0';
+					strncat(m4_path, m4, sizeof(m4_path) - strlen(m4_path) - 1);
+					if (stat(m4_path, &sbuf) == 0 &&
+						(S_ISREG(sbuf.st_mode)) && sbuf.st_mode & S_IXUSR) {
+						m4 = strdup(m4_path);
+						break;
+					}
+					path = endOfDir+1;
+				} while (path[0]);
+				if (!path[0])
+				    m4 = M4;
+			}
+		}
+	}
     filter_create_ext(output_chain, m4, "-P", 0);
     filter_create_int(output_chain, filter_fix_linedirs, NULL);
 
@@ -386,7 +413,7 @@ void check_options (void)
 		FILE   *tablesout;
 		struct yytbl_hdr hdr;
 		char   *pname = 0;
-		int     nbytes = 0;
+		size_t  nbytes = 0;
 
 		buf_m4_define (&m4defs_buf, "M4_YY_TABLES_EXTERNAL", NULL);
 
@@ -398,8 +425,7 @@ void check_options (void)
 
 		if ((tablesout = fopen (tablesfilename, "w")) == NULL)
 			lerr (_("could not create %s"), tablesfilename);
-		if (pname)
-			free (pname);
+		free(pname);
 		tablesfilename = 0;
 
 		yytbl_writer_init (&tableswr, tablesout);
@@ -451,7 +477,8 @@ void check_options (void)
              char *str, *fmt = "#define %s %d\n";
              size_t strsz;
 
-             str = (char*)flex_alloc(strsz = strlen(fmt) + strlen(scname[i]) + (int)(1 + log10(i)) + 2);
+             strsz = strlen(fmt) + strlen(scname[i]) + (size_t)(1 + ceil (log10(i))) + 2;
+             str = malloc(strsz);
              if (!str)
                flexfatal(_("allocation of macro definition failed"));
              snprintf(str, strsz, fmt,      scname[i], i - 1);
@@ -986,9 +1013,9 @@ void flexinit (int argc, char **argv)
     flex_init_regex();
 
 	/* Enable C++ if program name ends with '+'. */
-	program_name = basename2 (argv[0], 0);
+	program_name = basename (argv[0]);
 
-	if (program_name[0] != '\0' &&
+	if (program_name != NULL &&
 	    program_name[strlen (program_name) - 1] == '+')
 		C_plus_plus = true;
 
@@ -1109,7 +1136,7 @@ void flexinit (int argc, char **argv)
 			break;
 
         case OPT_PREPROC_LEVEL:
-            preproc_level = strtol(arg,NULL,0);
+            preproc_level = (int) strtol(arg,NULL,0);
             break;
 
 		case OPT_MAIN:
@@ -1272,7 +1299,7 @@ void flexinit (int argc, char **argv)
 				}
 				else {
 					buf_strnappend (&userdef_buf, arg,
-							def - arg);
+							(int) (def - arg));
 					buf_strappend (&userdef_buf, " ");
 					buf_strappend (&userdef_buf,
 						       def + 1);
@@ -1594,10 +1621,7 @@ void readin (void)
 		outn ("\n#define FLEX_DEBUG");
 
 	OUT_BEGIN_CODE ();
-	if (csize == 256)
-		outn ("typedef unsigned char YY_CHAR;");
-	else
-		outn ("typedef char YY_CHAR;");
+	outn ("typedef flex_uint8_t YY_CHAR;");
 	OUT_END_CODE ();
 
 	if (C_plus_plus) {
@@ -1776,24 +1800,6 @@ void set_up_initial_allocations (void)
 	nultrans = NULL;
 }
 
-
-/* extracts basename from path, optionally stripping the extension "\.*"
- * (same concept as /bin/sh `basename`, but different handling of extension). */
-static char *basename2 (char *path, int /* boolean */ strip_ext)
-{
-	char   *b, *e = 0;
-
-	b = path;
-	for (b = path; *path; path++)
-		if (*path == '/')
-			b = path + 1;
-		else if (*path == '.')
-			e = path;
-
-	if (strip_ext && e && e > b)
-		*e = '\0';
-	return b;
-}
 
 void usage (void)
 {

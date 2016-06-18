@@ -59,7 +59,7 @@ extern const char *escaped_qstart, *escaped_qend;
 #define MARK_END_OF_PROLOG mark_prolog();
 
 #define YY_DECL \
-	int flexscan()
+	int flexscan(void)
 
 #define RETURNCHAR \
 	yylval = (unsigned char) yytext[0]; \
@@ -78,8 +78,10 @@ extern const char *escaped_qstart, *escaped_qend;
 	return NAME;
 
 #define PUT_BACK_STRING(str, start) \
-	for ( i = strlen( str ) - 1; i >= start; --i ) \
-		unput((str)[i])
+	{ size_t i = strlen( str );	\
+	  while ( i > start )		\
+	    unput((str)[--i]);		\
+	}
 
 #define CHECK_REJECT(str) \
 	if ( all_upper( str ) ) \
@@ -134,8 +136,8 @@ M4QEND      "]]"
 	static int option_sense;
 
 	int doing_codeblock = false;
-	int i, brace_depth=0, brace_start_line=0;
-	unsigned char nmdef[MAXLINE];
+	int brace_depth=0, brace_start_line=0;
+	char nmdef[MAXLINE];
 
 
 <INITIAL>{
@@ -174,7 +176,7 @@ M4QEND      "]]"
 	^"%pointer".*{NL}	yytext_is_array = false; ++linenum;
 	^"%array".*{NL}		yytext_is_array = true; ++linenum;
 
-	^"%option"	BEGIN(OPTION); return OPTION_OP;
+	^"%option"	BEGIN(OPTION); return TOK_OPTION;
 
 	^"%"{LEXOPT}{OPTWS}[[:digit:]]*{OPTWS}{NL}	++linenum; /* ignore */
 	^"%"{LEXOPT}{WS}.*{NL}	++linenum;	/* ignore */
@@ -231,7 +233,7 @@ M4QEND      "]]"
 	[[:digit:]]+	linenum = myctoi( yytext );
 
 	\"[^"\n]*\"	{
-			flex_free( (void *) infilename );
+			free(infilename);
 			infilename = xstrdup(yytext + 1);
 			infilename[strlen( infilename ) - 1] = '\0';
 			}
@@ -272,8 +274,8 @@ M4QEND      "]]"
                 buf_strnappend(&top_buf, yytext, yyleng);
             }
 
-    {M4QSTART}  buf_strnappend(&top_buf, escaped_qstart, strlen(escaped_qstart));
-    {M4QEND}    buf_strnappend(&top_buf, escaped_qend, strlen(escaped_qend));
+    {M4QSTART}  buf_strnappend(&top_buf, escaped_qstart, (int) strlen(escaped_qstart));
+    {M4QEND}    buf_strnappend(&top_buf, escaped_qend, (int) strlen(escaped_qend));
 
     [^{}\r\n]  {
                 buf_strnappend(&top_buf, yytext, yyleng);
@@ -293,7 +295,7 @@ M4QEND      "]]"
 	{NOT_WS}[^\r\n]*	{
  		        if(yyleng < MAXLINE)
  		         {
-			strcpy( (char *) nmdef, yytext );
+			strcpy( nmdef, yytext );
  		         }
  		        else
  		         {
@@ -301,12 +303,12 @@ M4QEND      "]]"
  		           FLEX_EXIT(EXIT_FAILURE);
 			 }
 			/* Skip trailing whitespace. */
-			for ( i = strlen( (char *) nmdef ) - 1;
-			      i >= 0 && (nmdef[i] == ' ' || nmdef[i] == '\t');
-			      --i )
-				;
-
-			nmdef[i + 1] = '\0';
+			{
+			    size_t i = strlen( nmdef );
+			    while (i > 0 && (nmdef[i-1] == ' ' || nmdef[i-1] == '\t'))
+			       --i;
+			    nmdef[i] = '\0';
+			}
 
 			ndinstal( nmstr, nmdef );
 			didadef = true;
@@ -364,6 +366,7 @@ M4QEND      "]]"
 	interactive	interactive = option_sense;
 	lex-compat	lex_compat = option_sense;
 	posix-compat	posix_compat = option_sense;
+	line		gen_line_dirs = option_sense;
 	main		{
 			ACTION_M4_IFDEF( "M4""_YY_MAIN", option_sense);
             /* Override yywrap */
@@ -420,12 +423,12 @@ M4QEND      "]]"
     yyget_lloc      ACTION_M4_IFDEF("M4""_YY_NO_GET_LLOC", ! option_sense);
     yyset_lloc      ACTION_M4_IFDEF("M4""_YY_NO_SET_LLOC", ! option_sense);
 
-	extra-type	return OPT_EXTRA_TYPE;
-	outfile		return OPT_OUTFILE;
-	prefix		return OPT_PREFIX;
-	yyclass		return OPT_YYCLASS;
-	header(-file)?      return OPT_HEADER;
-	tables-file         return OPT_TABLES;
+	extra-type	return TOK_EXTRA_TYPE;
+	outfile		return TOK_OUTFILE;
+	prefix		return TOK_PREFIX;
+	yyclass		return TOK_YYCLASS;
+	header(-file)?      return TOK_HEADER_FILE;
+	tables-file         return TOK_TABLES_FILE;
 	tables-verify   {
                     tablesverify = option_sense;
                     if(!tablesext && option_sense)
@@ -527,8 +530,7 @@ M4QEND      "]]"
                         if (sf_skip_ws()){
                             /* We're in the middle of a (?x: ) pattern. */
                             /* Push back everything starting at the "|" */
-                            size_t amt;
-                            amt = strchr (yytext, '|') - yytext;
+                            int amt = (int) (strchr (yytext, '|') - yytext);
                             yyless(amt);
                         }
                         else {
@@ -627,7 +629,7 @@ M4QEND      "]]"
                    * The reason it was disabled is so yacc/bison can parse
                    * ccl operations, such as ccl difference and union.
                    */
-                &&  (cclval = ccllookup( (unsigned char *) nmstr )) != 0 )
+                &&  (cclval = ccllookup( nmstr )) != 0 )
 				{
 				if ( input() != ']' )
 					synerr( _( "bad character class" ) );
@@ -641,7 +643,7 @@ M4QEND      "]]"
 				/* We fudge a bit.  We know that this ccl will
 				 * soon be numbered as lastccl + 1 by cclinit.
 				 */
-				cclinstal( (unsigned char *) nmstr, lastccl + 1 );
+				cclinstal( nmstr, lastccl + 1 );
 
 				/* Push back everything but the leading bracket
 				 * so the ccl can be rescanned.
@@ -661,7 +663,7 @@ M4QEND      "]]"
      * context.
      */
 	"{"{NAME}"}"[[:space:]]?	 {
-			unsigned char *nmdefptr;
+			char *nmdefptr;
             int end_is_ws, end_ch;
 
             end_ch = yytext[yyleng-1];
@@ -685,7 +687,7 @@ nmstr[yyleng - 2 - end_is_ws] = '\0';  /* chop trailing brace */
 
 			else
 				{ /* push back name surrounded by ()'s */
-				int len = strlen( (char *) nmdefptr );
+				size_t len = strlen( nmdefptr );
                 if (end_is_ws)
                     unput(end_ch);
 
@@ -693,7 +695,7 @@ nmstr[yyleng - 2 - end_is_ws] = '\0';  /* chop trailing brace */
 				     (len > 0 && nmdefptr[len - 1] == '$')
                      || (end_is_ws && trlcontxt && !sf_skip_ws()))
 					{ /* don't use ()'s after all */
-					PUT_BACK_STRING((char *) nmdefptr, 0);
+					PUT_BACK_STRING(nmdefptr, 0);
 
 					if ( nmdefptr[0] == '^' )
 						BEGIN(CARETISBOL);
@@ -702,7 +704,7 @@ nmstr[yyleng - 2 - end_is_ws] = '\0';  /* chop trailing brace */
 				else
 					{
 					unput(')');
-					PUT_BACK_STRING((char *) nmdefptr, 0);
+					PUT_BACK_STRING(nmdefptr, 0);
 					unput('(');
 					}
 				}
@@ -1008,23 +1010,4 @@ void set_input_file( char *file )
 		}
 
 	linenum = 1;
-	}
-
-
-/* Wrapper routines for accessing the scanner's malloc routines. */
-
-void *flex_alloc( size_t size )
-	{
-	return malloc(size);
-	}
-
-void *flex_realloc( void *ptr, size_t size )
-	{
-	return realloc(ptr, size);
-	}
-
-void flex_free( void *ptr )
-	{
-	if ( ptr )
-		free( ptr );
 	}

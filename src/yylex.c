@@ -174,12 +174,12 @@ int     yylex (void)
 			fprintf (stderr, "<<EOF>>");
 			break;
 
-		case OPTION_OP:
+		case TOK_OPTION:
 			fprintf (stderr, "%s ", yytext);
 			break;
 
-		case OPT_OUTFILE:
-		case OPT_PREFIX:
+		case TOK_OUTFILE:
+		case TOK_PREFIX:
 		case CCE_ALNUM:
 		case CCE_ALPHA:
 		case CCE_BLANK:

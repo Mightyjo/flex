@@ -34,10 +34,10 @@
 
 /* declare functions that have forward references */
 
-void dump_associated_rules PROTO ((FILE *, int));
-void dump_transitions PROTO ((FILE *, int[]));
-void sympartition PROTO ((int[], int, int[], int[]));
-int symfollowset PROTO ((int[], int, int, int[]));
+void	dump_associated_rules(FILE *, int);
+void	dump_transitions(FILE *, int[]);
+void	sympartition(int[], int, int[], int[]);
+int	symfollowset(int[], int, int, int[]);
 
 
 /* check_for_backing_up - check a DFA state for backing up
@@ -154,7 +154,7 @@ void dump_associated_rules (FILE *file, int ds)
 		}
 	}
 
-	qsort (&rule_set [1], num_associated_rules, sizeof (rule_set [1]), intcmp);
+	qsort (&rule_set [1], (size_t) num_associated_rules, sizeof (rule_set [1]), intcmp);
 
 	fprintf (file, _(" associated rule line numbers:"));
 
@@ -515,7 +515,7 @@ void ntod (void)
      
 		yytbl_data_init (yynxt_tbl, YYTD_ID_NXT);
 		yynxt_tbl->td_hilen = 1;
-		yynxt_tbl->td_lolen = num_full_table_rows;
+		yynxt_tbl->td_lolen = (flex_uint32_t) num_full_table_rows;
 		yynxt_tbl->td_data = yynxt_data =
 			calloc(yynxt_tbl->td_lolen *
 					    yynxt_tbl->td_hilen,
@@ -793,8 +793,8 @@ void ntod (void)
 		mkdeftbl ();
 	}
 
-	flex_free ((void *) accset);
-	flex_free ((void *) nset);
+	free(accset);
+	free(nset);
 }
 
 
@@ -823,7 +823,7 @@ int snstods (int sns[], int numstates, int accset[], int nacc, int hashval, int 
 					/* We sort the states in sns so we
 					 * can compare it to oldsns quickly.
 					 */
-					qsort (&sns [1], numstates, sizeof (sns [1]), intcmp);
+					qsort (&sns [1], (size_t) numstates, sizeof (sns [1]), intcmp);
 					didsort = 1;
 				}
 
@@ -858,7 +858,7 @@ int snstods (int sns[], int numstates, int accset[], int nacc, int hashval, int 
 	 */
 
 	if (!didsort)
-		qsort (&sns [1], numstates, sizeof (sns [1]), intcmp);
+          	qsort (&sns [1], (size_t) numstates, sizeof (sns [1]), intcmp);
 
 	for (i = 1; i <= numstates; ++i)
 		dss[newds][i] = sns[i];
@@ -881,7 +881,7 @@ int snstods (int sns[], int numstates, int accset[], int nacc, int hashval, int 
 		 * match in the event of ties will work.
 		 */
 
-		qsort (&accset [1], nacc, sizeof (accset [1]), intcmp);
+		qsort (&accset [1], (size_t) nacc, sizeof (accset [1]), intcmp);
 
 		dfaacc[newds].dfaacc_set =
 			allocate_integer_array (nacc + 1);

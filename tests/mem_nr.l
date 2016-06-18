@@ -96,7 +96,7 @@ void * yyalloc(yy_size_t n)
     if( nptrs >= arrsz){
         /* increase array size by 1 */
         arrsz++;
-        ptrs = realloc(ptrs, arrsz * sizeof(struct memsz));
+        ptrs = realloc(ptrs, (size_t) arrsz * sizeof(struct memsz));
         ptrs[nptrs].p = 0;
         ptrs[nptrs].sz = 0;
     }
@@ -158,7 +158,7 @@ void yyfree(void* p)
 int main(void);
 
 int
-main ()
+main (void)
 {
     arrsz = 1;
     ptrs  = calloc(1, sizeof(struct memsz));

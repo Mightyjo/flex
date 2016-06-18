@@ -1,8 +1,8 @@
 /* parse.y - parser for flex input */
 
 %token CHAR NUMBER SECTEND SCDECL XSCDECL NAME PREVCCL EOF_OP
-%token OPTION_OP OPT_OUTFILE OPT_PREFIX OPT_YYCLASS OPT_HEADER OPT_EXTRA_TYPE
-%token OPT_TABLES
+%token TOK_OPTION TOK_OUTFILE TOK_PREFIX TOK_YYCLASS TOK_HEADER_FILE TOK_EXTRA_TYPE
+%token TOK_TABLES_FILE
 
 %token CCE_ALNUM CCE_ALPHA CCE_BLANK CCE_CNTRL CCE_DIGIT CCE_GRAPH
 %token CCE_LOWER CCE_PRINT CCE_PUNCT CCE_SPACE CCE_UPPER CCE_XDIGIT
@@ -184,27 +184,27 @@ namelist1	:  namelist1 NAME
 			{ synerr( _("bad start condition list") ); }
 		;
 
-options		:  OPTION_OP optionlist
+options		:  TOK_OPTION optionlist
 		;
 
 optionlist	:  optionlist option
 		|
 		;
 
-option		:  OPT_OUTFILE '=' NAME
+option		:  TOK_OUTFILE '=' NAME
 			{
 			outfilename = xstrdup(nmstr);
 			did_outfilename = 1;
 			}
-		|  OPT_EXTRA_TYPE '=' NAME
+		|  TOK_EXTRA_TYPE '=' NAME
 			{ extra_type = xstrdup(nmstr); }
-		|  OPT_PREFIX '=' NAME
+		|  TOK_PREFIX '=' NAME
 			{ prefix = xstrdup(nmstr); }
-		|  OPT_YYCLASS '=' NAME
+		|  TOK_YYCLASS '=' NAME
 			{ yyclass = xstrdup(nmstr); }
-		|  OPT_HEADER '=' NAME
+		|  TOK_HEADER_FILE '=' NAME
 			{ headerfilename = xstrdup(nmstr); }
-	    |  OPT_TABLES '=' NAME
+	    |  TOK_TABLES_FILE '=' NAME
             { tablesext = true; tablesfilename = xstrdup(nmstr); }
 		;
 
@@ -725,7 +725,7 @@ singleton	:  singleton '*'
 			{
 				/* Sort characters for fast searching.
 				 */
-				qsort( ccltbl + cclmap[$1], ccllen[$1], sizeof (*ccltbl), cclcmp );
+				qsort( ccltbl + cclmap[$1], (size_t) ccllen[$1], sizeof (*ccltbl), cclcmp );
 
 			if ( useecs )
 				mkeccl( ccltbl + cclmap[$1], ccllen[$1],

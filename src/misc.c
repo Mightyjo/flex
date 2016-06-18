@@ -60,14 +60,15 @@ static void sko_push(bool dc)
 {
     if(!sko_stack){
         sko_sz = 1;
-        sko_stack = (struct sko_state*)flex_alloc(sizeof(struct sko_state)*sko_sz);
+        sko_stack = malloc(sizeof(struct sko_state) * (size_t) sko_sz);
         if (!sko_stack)
             flexfatal(_("allocation of sko_stack failed"));
         sko_len = 0;
     }
     if(sko_len >= sko_sz){
         sko_sz *= 2;
-        sko_stack = (struct sko_state*)flex_realloc(sko_stack,sizeof(struct sko_state)*sko_sz);
+        sko_stack = realloc(sko_stack,
+			sizeof(struct sko_state) * (size_t) sko_sz);
     }
     
     /* initialize to zero and push */
@@ -137,7 +138,7 @@ static void action_m4_define (const char *defname, const char * value)
 /* Append "new_text" to the running buffer. */
 void add_action (const char *new_text)
 {
-	int     len = strlen (new_text);
+	int     len = (int) strlen (new_text);
 
 	while (len + action_index >= action_size - 10 /* slop */ ) {
 		int     new_size = action_size * 2;
@@ -166,9 +167,9 @@ void add_action (const char *new_text)
 void   *allocate_array (int size, size_t element_size)
 {
 	void *mem;
-	size_t  num_bytes = element_size * size;
+	size_t  num_bytes = element_size * (size_t) size;
 
-	mem = flex_alloc (num_bytes);
+	mem = malloc(num_bytes);
 	if (!mem)
 		flexfatal (_
 			   ("memory allocation failed in allocate_array()"));
@@ -325,9 +326,9 @@ void flexfatal (const char *msg)
 }
 
 
-/* htoi - convert a hexadecimal digit string to an integer value */
+/* htoui - convert a hexadecimal digit string to an unsigned integer value */
 
-int htoi (unsigned char str[])
+unsigned int htoui (unsigned char str[])
 {
 	unsigned int result;
 
@@ -520,19 +521,10 @@ unsigned char myesc (unsigned char array[])
 		return '\r';
 	case 't':
 		return '\t';
-
-#if defined (__STDC__)
 	case 'a':
 		return '\a';
 	case 'v':
 		return '\v';
-#else
-	case 'a':
-		return '\007';
-	case 'v':
-		return '\013';
-#endif
-
 	case '0':
 	case '1':
 	case '2':
@@ -555,7 +547,7 @@ unsigned char myesc (unsigned char array[])
 			c = array[sptr];
 			array[sptr] = '\0';
 
-			esc_char = otoi (array + 1);
+			esc_char = (unsigned char) otoui (array + 1);
 
 			array[sptr] = c;
 
@@ -577,7 +569,7 @@ unsigned char myesc (unsigned char array[])
 			c = array[sptr];
 			array[sptr] = '\0';
 
-			esc_char = htoi (array + 2);
+			esc_char = (unsigned char) htoui (array + 2);
 
 			array[sptr] = c;
 
@@ -590,9 +582,9 @@ unsigned char myesc (unsigned char array[])
 }
 
 
-/* otoi - convert an octal digit string to an integer value */
+/* otoui - convert an octal digit string to an unsigned integer value */
 
-int otoi (unsigned char str[])
+unsigned int otoui (unsigned char str[])
 {
 	unsigned int result;
 
@@ -683,14 +675,10 @@ char   *readable_form (int c)
 			return "\\r";
 		case '\t':
 			return "\\t";
-
-#if defined (__STDC__)
 		case '\a':
 			return "\\a";
 		case '\v':
 			return "\\v";
-#endif
-
 		default:
 			if(trace_hex)
 				snprintf (rform, sizeof(rform), "\\x%.2x", (unsigned int) c);
@@ -704,7 +692,7 @@ char   *readable_form (int c)
 		return "' '";
 
 	else {
-		rform[0] = c;
+		rform[0] = (char) c;
 		rform[1] = '\0';
 
 		return rform;
@@ -717,9 +705,9 @@ char   *readable_form (int c)
 void   *reallocate_array (void *array, int size, size_t element_size)
 {
 	void *new_array;
-	size_t  num_bytes = element_size * size;
+	size_t  num_bytes = element_size * (size_t) size;
 
-	new_array = flex_realloc (array, num_bytes);
+	new_array = realloc(array, num_bytes);
 	if (!new_array)
 		flexfatal (_("attempt to increase array size failed"));
 
@@ -864,8 +852,7 @@ void skelout (void)
  * element_n.  Formats the output with spaces and carriage returns.
  */
 
-void transition_struct_out (element_v, element_n)
-     int element_v, element_n;
+void transition_struct_out (int element_v, int element_n)
 {
 
 	/* short circuit any output */
@@ -889,11 +876,14 @@ void transition_struct_out (element_v, element_n)
 
 /* The following is only needed when building flex's parser using certain
  * broken versions of bison.
+ *
+ * XXX: this is should go soon
  */
 void   *yy_flex_xmalloc (int size)
 {
-	void   *result = flex_alloc ((size_t) size);
+	void   *result;
 
+	result = malloc((size_t) size);
 	if (!result)
 		flexfatal (_
 			   ("memory allocation failed in yy_flex_xmalloc()"));
@@ -901,22 +891,6 @@ void   *yy_flex_xmalloc (int size)
 	return result;
 }
 
-
-/* zero_out - set a region of memory to 0
- *
- * Sets region_ptr[0] through region_ptr[size_in_bytes - 1] to zero.
- */
-
-void zero_out (char *region_ptr, size_t size_in_bytes)
-{
-	char *rp, *rp_end;
-
-	rp = region_ptr;
-	rp_end = region_ptr + size_in_bytes;
-
-	while (rp < rp_end)
-		*rp++ = 0;
-}
 
 /* Remove all '\n' and '\r' characters, if any, from the end of str.
  * str can be any null-terminated string, or NULL.

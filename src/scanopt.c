@@ -37,18 +37,6 @@
 
 /* Internal structures */
 
-#ifdef HAVE_STRCASECMP
-#define STRCASECMP(a,b) strcasecmp(a,b)
-#else
-static int STRCASECMP PROTO ((const char *, const char *));
-
-static int STRCASECMP (const char *a, const char *b)
-{
-	while (tolower ((unsigned char)*a++) == tolower ((unsigned char)*b++)) ;
-	return b - a;
-}
-#endif
-
 #define ARG_NONE 0x01
 #define ARG_REQ  0x02
 #define ARG_OPT  0x04
@@ -75,15 +63,14 @@ struct _scanopt_t {
 };
 
 /* Accessor functions. These WOULD be one-liners, but portability calls. */
-static const char *NAME PROTO ((struct _scanopt_t *, int));
-static int PRINTLEN PROTO ((struct _scanopt_t *, int));
-static int RVAL PROTO ((struct _scanopt_t *, int));
-static int FLAGS PROTO ((struct _scanopt_t *, int));
-static const char *DESC PROTO ((struct _scanopt_t *, int));
-static int scanopt_err PROTO ((struct _scanopt_t *, int, int));
-static int matchlongopt PROTO ((char *, char **, int *, char **, int *));
-static int find_opt
-PROTO ((struct _scanopt_t *, int, char *, int, int *, int *opt_offset));
+static const char *NAME(struct _scanopt_t *, int);
+static int PRINTLEN(struct _scanopt_t *, int);
+static int RVAL(struct _scanopt_t *, int);
+static int FLAGS(struct _scanopt_t *, int);
+static const char *DESC(struct _scanopt_t *, int);
+static int scanopt_err(struct _scanopt_t *, int, int);
+static int matchlongopt(char *, char **, int *, char **, int *);
+static int find_opt(struct _scanopt_t *, int, char *, int, int *, int *opt_offset);
 
 static const char *NAME (struct _scanopt_t *s, int i)
 {
@@ -112,7 +99,7 @@ static const char *DESC (struct _scanopt_t *s, int i)
 }
 
 #ifndef NO_SCANOPT_USAGE
-static int get_cols PROTO ((void));
+static int get_cols (void);
 
 static int get_cols (void)
 {
@@ -170,7 +157,7 @@ scanopt_t *scanopt_init (const optspec_t *options, int argc, char **argv, int fl
 		s->optc++;
 
 	/* Build auxiliary data */
-	s->aux = malloc(s->optc * sizeof (struct _aux));
+	s->aux = malloc((size_t) s->optc * sizeof (struct _aux));
 
 	for (i = 0; i < s->optc; i++) {
 		const unsigned char *p, *pname;
@@ -191,7 +178,7 @@ scanopt_t *scanopt_init (const optspec_t *options, int argc, char **argv, int fl
 			pname = (const unsigned char *)(opt->opt_fmt + 1);
 			s->has_short = 1;
 		}
-		aux->printlen = strlen (opt->opt_fmt);
+		aux->printlen = (int) strlen (opt->opt_fmt);
 
 		aux->namelen = 0;
 		for (p = pname + 1; *p; p++) {
@@ -199,21 +186,21 @@ scanopt_t *scanopt_init (const optspec_t *options, int argc, char **argv, int fl
 			if (*p == '=' || isspace ((unsigned char)*p)
 			    || !(aux->flags & IS_LONG)) {
 				if (aux->namelen == 0)
-					aux->namelen = p - pname;
+					aux->namelen = (int) (p - pname);
 				aux->flags |= ARG_REQ;
 				aux->flags &= ~ARG_NONE;
 			}
 			/* detect optional arg. This overrides required arg. */
 			if (*p == '[') {
 				if (aux->namelen == 0)
-					aux->namelen = p - pname;
+					aux->namelen = (int) (p - pname);
 				aux->flags &= ~(ARG_REQ | ARG_NONE);
 				aux->flags |= ARG_OPT;
 				break;
 			}
 		}
 		if (aux->namelen == 0)
-			aux->namelen = p - pname;
+			aux->namelen = (int) (p - pname);
 	}
 	return (scanopt_t *) s;
 }
@@ -274,7 +261,7 @@ int     scanopt_usage (scanopt_t *scanner, FILE *fp, const char *usage)
 	fprintf (fp, "\n");
 
 	/* Sort by r_val and string. Yes, this is O(n*n), but n is small. */
-	store = malloc(s->optc * sizeof (usg_elem));
+	store = malloc((size_t) s->optc * sizeof (usg_elem));
 	for (i = 0; i < s->optc; i++) {
 
 		/* grab the next preallocate node. */
@@ -300,7 +287,7 @@ int     scanopt_usage (scanopt_t *scanner, FILE *fp, const char *usage)
 				}
 				if (!ptr_if_no_alias
 				    &&
-				    STRCASECMP (NAME (s, (*ue_curr)->idx),
+				    strcasecmp (NAME (s, (*ue_curr)->idx),
 						NAME (s, ue->idx)) > 0) {
 					ptr_if_no_alias = ue_curr;
 				}
@@ -372,7 +359,7 @@ int     scanopt_usage (scanopt_t *scanner, FILE *fp, const char *usage)
 			maxlen[0] = len;
 
 		/* It's much easier to calculate length for description column! */
-		len = strlen (DESC (s, ue->idx));
+		len = (int) strlen (DESC (s, ue->idx));
 		if (len > maxlen[1])
 			maxlen[1] = len;
 	}
@@ -578,13 +565,13 @@ static int matchlongopt (char *str, char **optname, int *optlen, char **arg, int
 		return 0;
 
 	p += 2;
-	*optname = (char *) p;
+	*optname = p;
 
 	/* find the end of optname */
 	while (*p && *p != '=')
 		++p;
 
-	*optlen = p - *optname;
+	*optlen = (int) (p - *optname);
 
 	if (!*p)
 		/* an option with no '=...' part. */
@@ -596,7 +583,7 @@ static int matchlongopt (char *str, char **optname, int *optlen, char **arg, int
 	*arg = p;
 	while (*p)
 		++p;
-	*arglen = p - *arg;
+	*arglen = (int) (p - *arg);
 
 	return 1;
 }
@@ -619,17 +606,15 @@ static int find_opt (struct _scanopt_t *s, int lookup_long, char *optstart, int
 		return 0;
 
 	for (i = 0; i < s->optc; i++) {
-		char   *optname;
+		const char   *optname;
 
-		optname =
-			(char *) (s->options[i].opt_fmt +
-				  (lookup_long ? 2 : 1));
+		optname = s->options[i].opt_fmt + (lookup_long ? 2 : 1);
 
 		if (lookup_long && (s->aux[i].flags & IS_LONG)) {
 			if (len > s->aux[i].namelen)
 				continue;
 
-			if (strncmp (optname, optstart, len) == 0) {
+			if (strncmp (optname, optstart, (size_t) len) == 0) {
 				nmatch++;
 				*opt_offset = i;
 
@@ -753,7 +738,7 @@ int     scanopt (scanopt_t *svoid, char **arg, int *optindex)
 			arglen = 0;
 		}
 		else
-			arglen = strlen (optarg);
+			arglen = (int) strlen (optarg);
 	}
 
 	/* At this point, we have a long or short option matched at opt_offset into
@@ -818,10 +803,9 @@ int     scanopt_destroy (scanopt_t *svoid)
 	struct _scanopt_t *s;
 
 	s = (struct _scanopt_t *) svoid;
-	if (s) {
-		if (s->aux)
-			free (s->aux);
-		free (s);
+	if (s != NULL) {
+		free(s->aux);
+		free(s);
 	}
 	return 0;
 }

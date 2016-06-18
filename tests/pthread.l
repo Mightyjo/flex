@@ -114,7 +114,7 @@ static pthread_mutex_t *file_locks;
 static char **filenames;
 
 
-void * thread_func ( void* arg )
+static void * thread_func ( void* arg )
 {
     int i;
 
@@ -126,8 +126,6 @@ void * thread_func ( void* arg )
 
     for( i =0 ; i < N_SCANS ; i++ )
     {
-        int main(int ARGC, char *ARGV[]);
-
         int next;
         yyscan_t  scanner;
         FILE * fp;
@@ -167,7 +165,7 @@ int main (int ARGC, char *ARGV[])
     }
 
     /* Allocate and initialize the locks. One for each filename in ARGV. */
-    file_locks = malloc((ARGC-1) * sizeof(pthread_mutex_t));
+    file_locks = malloc((size_t) (ARGC-1) * sizeof(pthread_mutex_t));
     for( i = 0; i < ARGC-1; i++)
         pthread_mutex_init( &file_locks[i], NULL );
 

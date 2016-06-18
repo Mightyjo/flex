@@ -19,6 +19,8 @@
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 # PURPOSE.
 
+AM_CFLAGS = $(WARNINGFLAGS)
+
 TESTS = $(check_PROGRAMS) options.cn
 
 # The script testwrapper.sh will run most tests as is. A couple tests
@@ -33,7 +35,7 @@ LOG_COMPILER = $(srcdir)/testwrapper.sh
 AM_LOG_FLAGS = -d $(srcdir) -r
 
 REJECT_LOG_COMPILER = $(srcdir)/testwrapper.sh
-AM_REJECT_LOG_FLAGS = -d $(srcdir) -i reject.txt -r
+AM_REJECT_LOG_FLAGS = -d $(srcdir) -i $(srcdir)/reject.txt -r
 
 TABLE_LOG_COMPILER = $(srcdir)/testwrapper.sh
 AM_TABLE_LOG_FLAGS = -d $(builddir) -i $(srcdir)/reject.txt -t
@@ -151,7 +153,9 @@ mem_r_SOURCES = mem_r.l
 multiple_scanners_nr_SOURCES = multiple_scanners_nr_main.c multiple_scanners_nr_1.l multiple_scanners_nr_2.l
 multiple_scanners_r_SOURCES = multiple_scanners_r_main.c multiple_scanners_r_1.l multiple_scanners_r_2.l
 noansi_nr_SOURCES = noansi_nr.l
+noansi_nr_CFLAGS = $(CFLAGS)
 noansi_r_SOURCES = noansi_r.l
+noansi_r_CFLAGS = $(CFLAGS)
 posix_SOURCES = posix.l
 posixly_correct_SOURCES = posixly_correct.l
 prefix_nr_SOURCES = prefix_nr.l
@@ -435,7 +439,7 @@ tableopts_tests  := $(tableopts_opttests) $(tableopts_vertests) $(tableopts_sert
 tableopts_c := $(addsuffix .c,$(tableopts_tests))
 
 OPT_LOG_COMPILER = $(srcdir)/testwrapper.sh
-AM_OPT_LOG_FLAGS = -d $(srcdir) -i tableopts.txt -r
+AM_OPT_LOG_FLAGS = -d $(srcdir) -i $(srcdir)/tableopts.txt -r
 
 tableopts_opt_nr%.c: tableopts.l4 $(FLEX)
 	$(FLEX) -P $(subst -,_,$(basename $(*F))) $* -o $@ $<

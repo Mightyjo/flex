@@ -24,11 +24,11 @@
 
 # autoconf requirements and initialization
 
-AC_INIT([the fast lexical analyser generator], [2.6.0], [flex-help@lists.sourceforge.net], [flex])
+AC_INIT([the fast lexical analyser generator],[2.6.2],[flex-help@lists.sourceforge.net],[flex])
 AC_CONFIG_SRCDIR([src/scan.l])
 AC_CONFIG_AUX_DIR([build-aux])
 LT_INIT
-AM_INIT_AUTOMAKE([gnu check-news std-options dist-bzip2 dist-xz parallel-tests 1.14.1])
+AM_INIT_AUTOMAKE([-Wno-portability gnu check-news std-options dist-xz parallel-tests 1.14.1])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_LIBOBJ_DIR([lib])
 AC_CONFIG_MACRO_DIR([m4])
@@ -48,23 +48,33 @@ AC_PROG_LN_S
 AC_PROG_AWK
 AC_PROG_INSTALL
 
+# allow passing a variable `WARNINGFLAGS',
+#   either when invoking `configure', or when invoking `make'
+# default to something useful if GCC was detected
+
+AC_ARG_ENABLE([warnings],
+  [AS_HELP_STRING([--enable-warnings],
+                  [enable a bunch of compiler warning flags (defaults to GCC warning flags).])],
+  [AS_IF([test "x$GCC" == xyes],
+    [ : ${WARNINGFLAGS="-Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes -Wnested-externs -Wold-style-definition -Wredundant-decls -Wconversion -Wno-unused-but-set-variable"} ])])
+
+AC_SUBST([WARNINGFLAGS])
+
 AC_PATH_PROG([BISON], bison, no)
 AS_IF([test "$BISON" != no],[],
-	[ AC_SUBST([BISON], [\${top_srcdir}/build-aux/missing bison]) 
+	[ AC_SUBST([BISON], [\${top_srcdir}/build-aux/missing bison])
 	  AC_MSG_NOTICE(no bison program found: only required for maintainers)
 	])
 
-AC_PATH_PROG([HELP2MAN], help2man, no)
-AS_IF([test "$HELP2MAN" != no],[],i
-	[ AC_SUBST([HELP2MAN], [\${top_srcdir}/build-aux/missing help2man])
-	  AC_MSG_NOTICE(no help2man program found: only required for maintainers)
-	])
+AC_PATH_PROG([HELP2MAN], help2man, [\${top_srcdir}/build-aux/missing help2man])
+  AS_IF([test -z "$ac_cv_path_HELP2MAN" ],[],
+    AC_MSG_WARN(program not found: help2man: building man page will not work)
+  )
 
-AC_PATH_PROGS([TEXI2DVI], [gtexi2dvi texi2dvi], [no])
-AS_IF([test "$TEXI2DVI" != no],[],
-	[ AC_SUBST([TEXI2DVI], [:])
-	  AC_MSG_NOTICE(no texi2dvi program found: only required for maintainers)
-	])
+AC_PATH_PROGS([TEXI2DVI], [gtexi2dvi texi2dvi], [\${top_srcdir}/build-aux/missing texi2dvi])
+  AS_IF([test -z "$ac_cv_path_TEXI2DVI" ], [],
+    AC_MSG_WARN(texi2dvi: program not found: building pdf version of manual will not work)
+  )
 
 # Check for a m4 that supports -P
 
@@ -93,9 +103,7 @@ fi
 
 # checks for headers
 
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([inttypes.h libintl.h limits.h locale.h malloc.h netinet/in.h regex.h stddef.h stdlib.h string.h strings.h unistd.h])
+AC_CHECK_HEADERS([inttypes.h libintl.h limits.h locale.h malloc.h netinet/in.h regex.h unistd.h])
 
 # checks for libraries
 
@@ -124,7 +132,17 @@ AC_FUNC_ALLOCA
 AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([dup2 isascii memset pow regcomp setlocale strchr strtol])
+
+AC_CHECK_FUNCS(dup2 dnl
+memset dnl
+pow dnl
+regcomp dnl
+setlocale dnl
+strchr dnl
+strdup dnl
+strtol)
+
+AC_REPLACE_FUNCS(reallocarray)
 
 AC_CONFIG_FILES(
 Makefile

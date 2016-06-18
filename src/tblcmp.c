@@ -36,11 +36,11 @@
 
 /* declarations for functions that have forward references */
 
-void mkentry PROTO ((int *, int, int, int, int));
-void mkprot PROTO ((int[], int, int));
-void mktemplate PROTO ((int[], int, int));
-void mv2front PROTO ((int));
-int tbldiff PROTO ((int[], int, int[]));
+void mkentry(int *, int, int, int, int);
+void mkprot(int[], int, int);
+void mktemplate(int[], int, int);
+void mv2front(int);
+int tbldiff(int[], int, int[]);
 
 
 /* bldtbl - build table entries for dfa state
@@ -299,8 +299,7 @@ void    expand_nxt_chk (void)
 	nxt = reallocate_integer_array (nxt, current_max_xpairs);
 	chk = reallocate_integer_array (chk, current_max_xpairs);
 
-	zero_out ((char *) (chk + old_max),
-		  (size_t) (MAX_XPAIRS_INCREMENT * sizeof (int)));
+	memset(chk + old_max, 0, MAX_XPAIRS_INCREMENT * sizeof(int));
 }
 
 
@@ -421,9 +420,7 @@ void    inittbl (void)
 {
 	int i;
 
-	zero_out ((char *) chk,
-
-		  (size_t) (current_max_xpairs * sizeof (int)));
+	memset(chk, 0, (size_t) current_max_xpairs * sizeof(int));
 
 	tblend = 0;
 	firstfree = tblend + 1;
@@ -706,7 +703,8 @@ void    mktemplate (int state[], int statenum, int comstate)
 		if (state[i] == 0)
 			tnxt[tmpbase + i] = 0;
 		else {
-			transset[tsptr++] = i;
+			/* Note: range 1..256 is mapped to 1..255,0 */
+			transset[tsptr++] = (unsigned char) i;
 			tnxt[tmpbase + i] = comstate;
 		}
 

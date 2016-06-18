@@ -59,12 +59,10 @@ static struct hash_entry *ccltab[CCL_HASH_SIZE];
 
 /* declare functions that have forward references */
 
-static int addsym PROTO ((char[], char *, int, hash_table, int));
-static struct hash_entry *findsym PROTO ((const char *sym,
-					  hash_table table,
-
-					  int table_size));
-static int hashfunct PROTO ((const char *, int));
+static int addsym(char[], char *, int, hash_table, int);
+static struct hash_entry *findsym (const char *sym, hash_table table,
+				   int table_size);
+static int hashfunct(const char *, int);
 
 
 /* addsym - add symbol and definitions to symbol table
@@ -88,8 +86,7 @@ static int addsym (char sym[], char *str_def, int int_def, hash_table table, int
 	}
 
 	/* create new entry */
-	new_entry = (struct hash_entry *)
-		flex_alloc (sizeof (struct hash_entry));
+	new_entry = malloc(sizeof(struct hash_entry));
 
 	if (new_entry == NULL)
 		flexfatal (_("symbol table memory allocation failed"));
@@ -114,7 +111,7 @@ static int addsym (char sym[], char *str_def, int int_def, hash_table table, int
 
 /* cclinstal - save the text of a character class */
 
-void    cclinstal (unsigned char ccltxt[], int cclnum)
+void    cclinstal (char ccltxt[], int cclnum)
 {
 	/* We don't bother checking the return status because we are not
 	 * called unless the symbol is new.
@@ -130,9 +127,9 @@ void    cclinstal (unsigned char ccltxt[], int cclnum)
  * Returns 0 if there's no CCL associated with the text.
  */
 
-int     ccllookup (unsigned char ccltxt[])
+int     ccllookup (char ccltxt[])
 {
-	return findsym ((char *) ccltxt, ccltab, CCL_HASH_SIZE)->int_val;
+	return findsym (ccltxt, ccltab, CCL_HASH_SIZE)->int_val;
 }
 
 
@@ -177,7 +174,7 @@ static int hashfunct (const char *str, int hash_size)
 
 /* ndinstal - install a name definition */
 
-void    ndinstal (const char *name, unsigned char definition[])
+void    ndinstal (const char *name, char definition[])
 {
 
 	if (addsym (xstrdup(name),
@@ -192,9 +189,9 @@ void    ndinstal (const char *name, unsigned char definition[])
  * Returns a nil pointer if the name definition does not exist.
  */
 
-unsigned char   *ndlookup (const char *nd)
+char   *ndlookup (const char *nd)
 {
-	return (unsigned char *) findsym (nd, ndtbl, NAME_TABLE_HASH_SIZE)->str_val;
+	return findsym (nd, ndtbl, NAME_TABLE_HASH_SIZE)->str_val;
 }
 
 

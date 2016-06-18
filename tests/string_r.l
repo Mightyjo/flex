@@ -59,10 +59,10 @@
 int main(void);
 
 int
-main ()
+main (void)
 {
     char * buf;
-    int len;
+    size_t len;
     YY_BUFFER_STATE state;
     yyscan_t  scanner=NULL;
 

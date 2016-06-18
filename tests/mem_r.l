@@ -98,7 +98,7 @@ void * yyalloc(yy_size_t n , void* yyscanner)
     if( nptrs >= arrsz){
         /* increase array size by 1 */
         arrsz++;
-        ptrs = realloc(ptrs, arrsz * sizeof(struct memsz));
+        ptrs = realloc(ptrs, (size_t) arrsz * sizeof(struct memsz));
         ptrs[nptrs].p = 0;
         ptrs[nptrs].sz = 0;
     }
@@ -164,7 +164,7 @@ void yyfree(void* p , void* yyscanner)
 int main(void);
 
 int
-main ()
+main (void)
 {
     yyscan_t scanner;
     arrsz = 1;
