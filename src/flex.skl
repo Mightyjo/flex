@@ -56,8 +56,16 @@ m4_changequote([[, ]])
 %#   edit the skeleton.
 %#
 
+%#
+%#   Macros that customize this skeleton to a specific target language.
+%#
+
 %#   Define language-specific macros controlling emission.
 %#   Skeleton authors must alter these to conform to their target language.
+
+%#   Define the standard input and output files, with and without initialization.
+m4_define( [[M4_YY_STDINIT]], [[FILE *yyin = stdin, *yyout = stdout;]] )
+m4_define( [[M4_YY_NO_STDINIT]], [[FILE *yyin = NULL, *yyout = NULL;]] )
 
 %#   Defines table alignment macro.  
 %#   The test macro is defined when the -Ca command line argument is specified.
@@ -109,12 +117,168 @@ m4_define( [[YYDMAP_ENTRY]], [[\t{$1, (void**)&$2, sizeof(YY_INT_ALIGNED)},\n]] 
 %#      /param1 - the new (integer) value of YY_NXT_LOLEN
 m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)\n]] )
 
+
+%#   The skeleton uses the following macros to implement CLI switch-controlled emissions.
+%#   They are either emitted directly from main.c in flexinit() and readin() or by M4_YY_USERDEF.  
+%#   They are listed here for documentation's sake.  They are wrapped in m4_undefs to ensure they 
+%#   don't break anything if they're uncommented and unused.  This way you can uncomment them in a
+%#   new skeleton to indicate that they are ignored in your code.
+
+%# m4_undef( [[M4_YY_MORE_USED]] )
+%# m4_undef( [[M4_YY_USES_REJECT]] )
+%# m4_undef( [[M4_YY_SKIP_YYWRAP]] )
+%# m4_undef( [[M4_FLEX_DEBUG]] )
+%# m4_undef( [[M4_YY_REENTRANT]] )
+%# m4_undef( [[M4_YYTEXT_PTR]] )
+%# m4_undef( [[M4_YY_INTERACTIVE]] )
+%# m4_undef( [[M4_DO_STDINIT]] )
+%# m4_undef( [[M4_YY_FULLSPD]] )
+%# m4_undef( [[M4_LEX_COMPAT]] )
+%# m4_undef( [[M4_YYCLASS]] )
+%# m4_undef( [[M4_YYTEXT_IS_ARRAY]] )
+%# m4_undef( [[M4_YY_MAIN]] )
+%# m4_undef( [[M4_YY_NO_UNISTD_H]] )
+%# m4_undef( [[M4_YY_ALWAYS_INTERACTIVE]] )
+%# m4_undef( [[M4_YY_NEVER_INTERACTIVE]] )
+%# m4_undef( [[M4_YY_STACK_USED]] )
+%# m4_undef( [[M4_YYCLASS]] )
+%# m4_undef( [[M4_YY_NO_PUSH_STATE]] )
+%# m4_undef( [[M4_YY_NO_POP_STATE]] )
+%# m4_undef( [[M4_YY_NO_TOP_STATE]] )
+%# m4_undef( [[M4_YY_NO_UNPUT]] )
+%# m4_undef( [[M4_YY_NO_SCAN_BUFFER]] )
+%# m4_undef( [[M4_YY_NO_SCAN_BYTES]] )
+%# m4_undef( [[M4_YY_NO_SCAN_STRING]] )
+%# m4_undef( [[M4_YY_NO_GET_EXTRA]] )
+%# m4_undef( [[M4_YY_NO_SET_EXTRA]] )
+%# m4_undef( [[M4_YY_NO_GET_LENG]] )
+%# m4_undef( [[M4_YY_NO_GET_TEXT]] )
+%# m4_undef( [[M4_YY_NO_GET_LINENO]] )
+%# m4_undef( [[M4_YY_NO_SET_LINENO]] )
+%# m4_undef( [[M4_YY_NO_GET_IN]] )
+%# m4_undef( [[M4_YY_NO_SET_IN]] )
+%# m4_undef( [[M4_YY_NO_GET_OUT]] )
+%# m4_undef( [[M4_YY_NO_SET_OUT]] )
+%# m4_undef( [[M4_YY_NO_GET_LVAL]] )
+%# m4_undef( [[M4_YY_NO_SET_LVAL]] )
+%# m4_undef( [[M4_YY_NO_GET_LLOC]] )
+%# m4_undef( [[M4_YY_NO_SET_LLOC]] )
+
+%#
+%#   Begin actual emission of code
+%#
+
 %#   Emit the user-defined top block from the input.
 m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK, [[]])
 
 %#   Emit any user-defined constants from the input or command line.
+m4_ifdef( [[M4_YY_MAIN]], [[#define YY_MAIN 1]], [[#define YY_MAIN 0]] )
 m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF, [[]])
 
+%#   Emit the right definitions for yywrap
+m4_ifndef( [[M4_YY_SKIP_YYWRAP]],
+%if-c-only
+  m4_ifdef( [[M4_YY_REENTRANT]],
+            [[#define yywrap(yyscanner) (/*CONSTCOND*/1)]],
+            [[#define yywrap() (/*CONSTCOND*/1)]] )
+%endif
+)
+
+%#   Enable debugging, or not
+m4_ifdef( [[M4_FLEX_DEBUG]], [[#define FLEX_DEBUG (/*CONSTCOND*/1)]] )
+
+%#   Define the flex_uint8_t type
+m4_ifdef( [[M4_YY_IN_HEADER]], , [[typedef flex_uint8_t YY_CHAR;]] )
+
+%#   Define the yytext_ptr macro, if needed
+m4_ifdef( [[M4_YYTEXT_PTR]], [[#define yytxp_ptr yytext]] )
+
+%#   Decide what to emit regarding the standard input and output files.
+m4_ifdef( [[M4_YY_IN_HEADER]], , [[
+    m4_ifdef( [[M4_DO_STDINIT]], [[
+      m4_ifdef( [[M4_YY_REENTRANT]], [[
+                #ifdef VMS
+                  #ifdef __VMS_POSIX
+                    #define YY_STDINIT
+                  #endif
+                #else
+                  #define YY_STDINIT
+                #endif
+                ]] )
+      #ifdef VMS
+        #ifndef __VMS_POSIX
+          M4_YY_NO_STDINIT
+        #else
+          M4_YY_STDINIT
+        #endif
+      #else
+        M4_YY_STDINIT
+      #endif
+              ]],
+              [[
+    m4_ifndef( [[M4_YY_REENTRANT]], [[M4_YY_STDINIT]] )        
+              ]] )
+]] )
+
+%#  Define what to emit for the -F CLI swtich
+m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
+  m4_ifdef( [[M4_YY_FULLSPD]], 
+            [[typedef yyconst struct yy_trans_info *yy_state_type;]],
+            [[%if-c-only
+              typedef int yy_state_type;
+              %endif]] )
+]])
+
+%#   Define handling for the --lex-compat flag
+m4_ifdef( [[M4_LEX_COMPAT]], [[#define YY_FLEX_LEX_COMPAT]] )
+
+%#   Define yylineno for C
+%if-c-only
+m4_ifndef( [[M4_YY_REENTRANT]], [[
+    extern int yylineno;
+  m4_ifdef( [[M4_YY_IN_HEADER]], , [[
+	int yylineno = 1;
+    ]])
+]] )
+%endif
+
+%#   Define C++ specifics
+%#   main.c:1705
+%if-c++-only
+#include <FlexLexer.h>
+
+m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
+int yyFlexLexer::yywrap() { return 1; }
+]])
+
+m4_ifdef( [[M4_YYCLASS]], [[
+int yyFlexLexer::yylex()
+{
+    LexerError( "yyFlexLexer::yylex invoked but %option yyclass used" );
+    return 0;
+}
+
+#define YY_DECL int M4_YYCLASS::yylex()
+]])
+%endif
+
+%#   Define yytxp_ptr in C 
+%#    main.c:1724
+%if-c-only
+m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], 
+          [[m4_ifndef( [[M4_YY_REENTRANT]], [[extern char yytext[];]] ) ]],
+		  [[m4_ifdef( [[M4_YY_REENTRANT]], 
+                      [[#define yytext_ptr yytext_r]], 
+                      [[
+                      extern char *yytext;
+                      
+                      #ifdef yytext_ptr
+                        #undef yytext_ptr
+                      #endif
+                      #define yytext_ptr yytext
+                      ]])
+          ]])
+%endif
 
 
 %not-for-header
