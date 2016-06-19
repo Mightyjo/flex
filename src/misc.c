@@ -260,7 +260,7 @@ void dataend (void)
 			dataflush ();
 
 		/* add terminator for initialization; { for vi */
-		outn ("    } ;\n");
+		outn ("INDENT LAST_ROW");
 	}
 	dataline = 0;
 	datapos = 0;
@@ -275,13 +275,13 @@ void dataflush (void)
 	if (!gentables)
 		return;
 
-	outc ('\n');
+	out ("TABLE_BLOCK");
 
 	if (++dataline >= NUMDATALINES) {
 		/* Put out a blank line so that the table is grouped into
 		 * large blocks that enable the user to find elements easily.
 		 */
-		outc ('\n');
+		out ("TABLE_BLOCK");
 		dataline = 0;
 	}
 
@@ -418,20 +418,20 @@ void mk2data (int value)
 		return;
 
 	if (datapos >= NUMDATAITEMS) {
-		outc (',');
+		out ("COLUMN_SEPARATOR");
 		dataflush ();
 	}
 
 	if (datapos == 0)
 		/* Indent. */
-		out ("    ");
+		out ("INDENT ");
 
 	else
-		outc (',');
+		out ("COLUMN_SEPARATOR");
 
 	++datapos;
 
-	out_dec ("%5d", value);
+	out_dec ("TABLE_DATA(%5d)", value);
 }
 
 
@@ -447,19 +447,19 @@ void mkdata (int value)
 		return;
 
 	if (datapos >= NUMDATAITEMS) {
-		outc (',');
+		out ("COLUMN_SEPARATOR");
 		dataflush ();
 	}
 
 	if (datapos == 0)
 		/* Indent. */
-		out ("    ");
+		out ("INDENT ");
 	else
-		outc (',');
+		out ("COLUMN_SEPARATOR");
 
 	++datapos;
 
-	out_dec ("%5d", value);
+	out_dec ("TABLE_DATA(%5d)", value);
 }
 
 
