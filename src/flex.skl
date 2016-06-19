@@ -55,16 +55,66 @@ m4_changequote([[, ]])
 %#   edit the skeleton.
 %#
 
+%#   Define language-specific macros controlling emission.
+%#   Skeleton authors must alter these to conform to their target language.
+
+%#   Defines table alignment macro.  
+%#   The test macro is defined when the -Ca command line argument is specified.
+%#   Possibly only useful in skeletons for C/C++ and kin.
+m4_ifdef([[M4_YY_LONG_ALIGNED]],
+#define YY_INT_ALIGNED flex_int32_t,
+#define YY_INT_ALIGNED flex_int16_t
+)
+
+%#   Defines a table with a parameterized name and dimension.
+%#      /param1 - name of the table
+%#      /param2 - number of rows
+m4_define( [[DEFINE_TABLE_2D]], [[static yyconst YY_INT_ALIGNED $1 [][$2] =\n    {\n]] )
+
+%#   Defines an array with a parameterized name and dimension.
+%#      /param1 - name of the table
+%#      /param2 - number of cells
+m4_define( [[DEFINE_ARRAY]], [[static yyconst YY_INT_ALIGNED $1 [$2] =\n    {\n]] )
+
+%#   Like DEFINE_TABLE, but for strictly empty tables
+%#      /param1 - name of the table
+m4_define( [[DEFINE_TABLE_EMPTY]], [[static yyconst YY_INT_ALIGNED * $1 = 0;\n]] )
+
+%#   Defines the end-of-table syntax
+m4_define( [[END_TABLE]], [[}]] )
+
+%#   Defines the row separator syntax
+m4_define( [[BEGIN_ROW]], [[{]] )
+m4_define( [[END_ROW]], [[},\n]] )
+m4_define( [[LAST_ROW]], [[} ;\n]] )
+
+%#   Defines the column separator syntax
+m4_define( [[COLUMN_SEPARATOR]], [[,]] )
+
+%#   Defines the table entry syntax
+%#      /param1 - the table entry
+m4_define( [[TABLE_DATA]], [[$1]] )
+
+%#   Defines spacing for pretty-printing tables
+m4_define( [[INDENT]], [[    ]] )
+m4_define( [[TABLE_BLOCK]], [[\n]] )
+
+%#   Defines an entry in the table map emitted by the %tables-yydmap command
+%#      /param1 - A table ID constant
+%#      /param2 - A handle for a table, usually a symbol/name/etc
+m4_define( [[YYDMAP_ENTRY]], [[\t{$1, (void**)&$2, sizeof(YY_INT_ALIGNED)},\n]] )
+
+%#   Redefines the YY_NXT_LOLEN constant used to index tables in the C/C++ scanner
+%#      /param1 - the new (integer) value of YY_NXT_LOLEN
+m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)\n]] )
+
 %#   Emit the user-defined top block from the input.
 m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK, [[]])
 
 %#   Emit any user-defined constants from the input or command line.
 m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF, [[]])
 
-m4_ifdef([[M4_YY_LONG_ALIGNED]],
-#define YY_INT_ALIGNED long int,
-#define YY_INT_ALIGNED short int
-)
+
 
 %not-for-header
 %if-c-only

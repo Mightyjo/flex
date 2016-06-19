@@ -523,26 +523,34 @@ void ntod (void)
 		yynxt_curr = 0;
 
 		buf_prints (&yydmap_buf,
-			    "\t{YYTD_ID_NXT, (void**)&yy_nxt, sizeof(%s)},\n",
+		/*	    "\t{YYTD_ID_NXT, (void**)&yy_nxt, sizeof(%s)},\n",
 			    long_align ? "flex_int32_t" : "flex_int16_t");
+        */
+                "YYDMAP_ENTRY( %s, %s )", "YYTD_ID_NXT", "yy_nxt");
 
 		/* Unless -Ca, declare it "short" because it's a real
 		 * long-shot that that won't be large enough.
 		 */
 		if (gentables)
-			out_str_dec
+		/*	out_str_dec
 				("static yyconst %s yy_nxt[][%d] =\n    {\n",
 				 long_align ? "flex_int32_t" : "flex_int16_t",
 				 num_full_table_rows);
+        */
+            out_str_dec("DEFINE_TABLE(%s, %d)", "yy_nxt", num_full_table_rows);
 		else {
-			out_dec ("#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN (%d)\n", num_full_table_rows);
-			out_str ("static yyconst %s *yy_nxt =0;\n",
+		/*	out_dec ("#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN (%d)\n", num_full_table_rows); */
+            out_dec ("RESET_NXT_LOLEN(%d)", num_full_table_rows);
+		/*	out_str ("static yyconst %s *yy_nxt =0;\n",
 				 long_align ? "flex_int32_t" : "flex_int16_t");
+        */
+            out_str("DEFINE_TABLE_EMPTY( %s )", "yy_nxt");
 		}
 
 
 		if (gentables)
-			outn ("    {");
+		/*	outn ("    {"); */
+            outn ("INDENT BEGIN_ROW");
 
 		/* Generate 0 entries for state #0. */
 		for (i = 0; i < num_full_table_rows; ++i) {
@@ -552,7 +560,7 @@ void ntod (void)
 
 		dataflush ();
 		if (gentables)
-			outn ("    },\n");
+			outn ("INDENT END_ROW");
 	}
 
 	/* Create the first states. */
@@ -708,7 +716,7 @@ void ntod (void)
 
 
 			if (gentables)
-				outn ("    {");
+				outn ("INDENT BEGIN_ROW");
 
 			/* Supply array's 0-element. */
 			if (ds == end_of_buffer_state) {
@@ -733,7 +741,7 @@ void ntod (void)
 
 			dataflush ();
 			if (gentables)
-				outn ("    },\n");
+				outn ("INDENT END_ROW");
 		}
 
 		else if (fullspd)
