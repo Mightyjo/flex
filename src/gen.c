@@ -1496,12 +1496,14 @@ void make_tables (void)
 	struct yytbl_data *yynultrans_tbl = NULL;
 
 
-	skelout ();		/* %% [2.0] - break point in skel */
+/* No longer needed */
+/*	skelout ();	*/	/* %% [2.0] - break point in skel */
 
 	/* First, take care of YY_DO_BEFORE_ACTION depending on yymore
 	 * being used.
 	 */
-	set_indent (1);
+/*	    
+    set_indent (1); 
 
 	if (yymore_used && !yytext_is_array) {
 		indent_puts ("YY_G(yytext_ptr) -= YY_G(yy_more_len); \\");
@@ -1511,9 +1513,10 @@ void make_tables (void)
 
 	else
 		indent_puts ("yyleng = (int) (yy_cp - yy_bp); \\");
-
+*/
 	/* Now also deal with copying yytext_ptr to yytext if needed. */
-	skelout ();		/* %% [3.0] - break point in skel */
+    /*skelout ();*/		/* %% [3.0] - break point in skel */
+/*    
 	if (yytext_is_array) {
 		if (yymore_used)
 			indent_puts
@@ -1541,7 +1544,7 @@ void make_tables (void)
 	}
 
 	set_indent (0);
-
+*/
 	skelout ();		/* %% [4.0] - break point in skel */
 
 

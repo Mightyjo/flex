@@ -484,6 +484,7 @@ m4_ifdef( [[M4_YY_ALWAYS_INTERACTIVE]], ,
 %endif
 
 %if-c-or-c++
+m4preproc_include(`flexint.h')
 m4preproc_include(`flexint_shared.h')
 %endif
 
@@ -898,11 +899,35 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
  */
 #define YY_DO_BEFORE_ACTION \
 	YY_G(yytext_ptr) = yy_bp; \
-%% [2.0] code to fiddle yytext and yyleng for yymore() goes here \
+%# %% [2.0] code to fiddle yytext and yyleng for yymore() goes here \
+m4_if( [[defined(M4_YY_USED) && !defined(M4_YYTEXT_IS_ARRAY)]],
+       [[
+	YY_G(yytext_ptr) -= YY_G(yy_more_len); \
+	yyleng = (int) (yy_cp - YY_G(yytext_ptr)); \
+       ]],
+       [[
+	yyleng = (int) (yy_cp - yy_bp); \
+       ]] 
+)
 	YY_G(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
-%% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \
-	YY_G(yy_c_buf_p) = yy_cp;
+%# %% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \
+m4_ifdef( [[M4_YYTEXT_IS_ARRAY]],
+    m4_ifdef( [[M4_YY_MORE_USED]],
+	[[if ( yyleng + YY_G(yy_more_offset) >= YYLMAX ) \]],
+    [[if ( yyleng >= YYLMAX ) \]]
+    )
+    [[YY_FATAL_ERROR( \"token too large, exceeds YYLMAX\" ); \]]
+    m4_ifdef( [[M4_YY_MORE_USED]],
+	[[yy_flex_strncpy( &yytext[YY_G(yy_more_offset)], YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \
+	yyleng += YY_G(yy_more_offset); \
+	YY_G(yy_prev_more_offset) = YY_G(yy_more_offset); \
+	YY_G(yy_more_offset) = 0; \]],
+    [[yy_flex_strncpy( yytext, YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \]]
+    )
+)
+    YY_G(yy_c_buf_p) = yy_cp;
+
 %% [4.0] data tables for the DFA and the user's section 1 definitions go here
 ]])
 
