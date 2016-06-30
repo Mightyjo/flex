@@ -653,6 +653,15 @@ void out_m4_define (const char* def, const char* val)
     fprintf(stdout, fmt, def, val?val:"");
 }
 
+/** Print "m4_define( [[def]], [[val]])m4_dnl\n".
+ * @param def The m4 symbol to define.
+ * @param val The definition; may be NULL.
+ */
+void out_m4_define_dec (const char* def, const int val)
+{
+    const char * fmt = "m4_define( [[%s]], [[%d]])m4_dnl\n";
+    fprintf(stdout, fmt, def, val);
+}
 
 /* readable_form - return the the human-readable form of a character
  *

@@ -163,6 +163,16 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)
 %# m4_undef( [[M4_YY_NO_GET_LLOC]] )
 %# m4_undef( [[M4_YY_NO_SET_LLOC]] )
 
+%# The skeleton uses the following macros during state table generation.
+%# Skeleton authors must determine how to translate these values into
+%# their target language.  That will depend heavily upon how you plan
+%# to walk the tables.  The C/C++ skeletons will provide some guidance.
+%# The macros are listed here without m4 decoration for documentation only.
+
+%# M4_YY_NUM_RULES
+%# M4_YY_END_OF_BUFFER
+%# M4_YY_TRANS_OFFSET_TYPE
+
 %#
 %#   Begin actual emission of code
 %#
@@ -1008,7 +1018,23 @@ m4_ifdef( [[M4_YYTEXT_IS_ARRAY]],
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
-%% [4.0] data tables for the DFA and the user's section 1 definitions go here
+%# %% [4.0] data tables for the DFA and the user's section 1 definitions go here
+#define YY_NUM_RULES M4_YY_NUM_RULES
+#define YY_END_OF_BUFFER M4_YY_END_OF_BUFFER
+
+me_ifndef( [[M4_YY_FULLSPD]], [[
+/* This struct is not used in this scanner */
+/* but its presence is necessary. */]]
+)
+struct yy_trans_info
+{
+    flex_int[[M4_YY_TRANS_OFFSET_TYPE]]_t yy_verify;
+    flex_int[[M4_YY_TRANS_OFFSET_TYPE]]_t yy_next;
+}
+
+%# TODO: A breakpoint is still needed here to output the tables.  Don't know what its number will be yet.
+%% [T.K] Placeholder for actual table emission.  Number TBD.
+
 ]])
 
 m4_ifdef( [[M4_YY_IN_HEADER]], [[#ifdef YY_HEADER_EXPORT_START_CONDITIONS]])
