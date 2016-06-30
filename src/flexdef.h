@@ -889,6 +889,7 @@ extern void out_str_dec(const char *, const char *, int);
 extern void outc(int);
 extern void outn(const char *);
 extern void out_m4_define(const char* def, const char* val);
+extern void out_m4_define_dec(const char* def, const int val);
 
 /* Return a printable version of the given character, which might be
  * 8-bit.
