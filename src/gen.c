@@ -1545,7 +1545,7 @@ void make_tables (void)
 
 	set_indent (0);
 */
-	skelout ();		/* %% [4.0] - break point in skel */
+/*	skelout ();		/* %% [4.0] - break point in skel */
 
 
 	/* This is where we REALLY begin generating the tables. */
@@ -1744,13 +1744,13 @@ void make_tables (void)
 
 		/* End generating yy_NUL_trans */
 	}
-
+/*
 	if (!C_plus_plus && !reentrant) {
 		indent_puts ("extern int yy_flex_debug;");
 		indent_put2s ("int yy_flex_debug = %s;\n",
 			      ddebug ? "1" : "0");
 	}
-
+*/
 	if (ddebug) {		/* Spit out table mapping rules to line numbers. */
 		out_str_dec (long_align ? get_int32_decl () :
 			     get_int16_decl (), "yy_rule_linenum",
@@ -1760,10 +1760,11 @@ void make_tables (void)
 		dataend ();
 	}
 
-	if (reject) {
+/*  if (reject) {
 		outn ("m4_ifdef( [[M4_YY_USES_REJECT]],\n[[");
+*/
 		/* Declare state buffer variables. */
-		if (!C_plus_plus && !reentrant) {
+/*	if (!C_plus_plus && !reentrant) {
 			outn ("static yy_state_type *yy_state_buf=0, *yy_state_ptr=0;");
 			outn ("static char *yy_full_match;");
 			outn ("static int yy_lp;");
@@ -1784,13 +1785,13 @@ void make_tables (void)
 
 		outn ("#define REJECT \\");
 		outn ("{ \\");
-		outn ("*yy_cp = YY_G(yy_hold_char); /* undo effects of setting up yytext */ \\");
-		outn ("yy_cp = YY_G(yy_full_match); /* restore poss. backed-over text */ \\");
+		outn ("*yy_cp = YY_G(yy_hold_char); /* undo effects of setting up yytext *\/ \\");
+		outn ("yy_cp = YY_G(yy_full_match); /* restore poss. backed-over text *\/ \\");
 
 		if (variable_trailing_context_rules) {
-			outn ("YY_G(yy_lp) = YY_G(yy_full_lp); /* restore orig. accepting pos. */ \\");
-			outn ("YY_G(yy_state_ptr) = YY_G(yy_full_state); /* restore orig. state */ \\");
-			outn ("yy_current_state = *YY_G(yy_state_ptr); /* restore curr. state */ \\");
+			outn ("YY_G(yy_lp) = YY_G(yy_full_lp); /* restore orig. accepting pos. *\/ \\");
+			outn ("YY_G(yy_state_ptr) = YY_G(yy_full_state); /* restore orig. state *\/ \\");
+			outn ("yy_current_state = *YY_G(yy_state_ptr); /* restore curr. state *\/ \\");
 		}
 
 		outn ("++YY_G(yy_lp); \\");
@@ -1803,10 +1804,18 @@ void make_tables (void)
 	else {
 		outn ("/* The intent behind this definition is that it'll catch");
 		outn (" * any uses of REJECT which flex missed.");
-		outn (" */");
+		outn (" *\/");
 		outn ("#define REJECT reject_used_but_not_detected");
 	}
+*/
 
+    if(variable_trailing_context_rules) {
+        out_m4_define("M4_YY_VARIABLE_TRAILING_CONTEXT_RULES", "");
+    }
+    out_m4_define_hex ("M4_YY_TRAILING_MASK", (unsigned int) YY_TRAILING_MASK);
+    out_m4_define_hex ("M4_YY_TRAILING_HEAD_MASK", (unsigned int) YY_TRAILING_HEAD_MASK);
+
+/*
 	if (yymore_used) {
 		if (!C_plus_plus) {
 			if (yytext_is_array) {
@@ -1870,7 +1879,13 @@ void make_tables (void)
                 outn ("char *yytext;");
 		}
 	}
-
+*/
+    
+    /* The need to output the user's actions here means we still need a skelout for now.
+     * This may be remediated by adding a % command to the skeleton down the line. 
+     */
+    skelout ();		/* %% [TK] - break point in skel */
+    
 	out (&action_array[defs1_offset]);
 
 	line_directive_out (stdout, 0);

@@ -163,6 +163,7 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)
 %# m4_undef( [[M4_YY_NO_SET_LVAL]] )
 %# m4_undef( [[M4_YY_NO_GET_LLOC]] )
 %# m4_undef( [[M4_YY_NO_SET_LLOC]] )
+%# m4_undef( [[M4_YY_VARIABLE_TRAILING_CONTEXT_RULES]] )
 
 %# The skeleton uses the following macros during state table generation.
 %# Skeleton authors must determine how to translate these values into
@@ -173,6 +174,8 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)
 %# M4_YY_NUM_RULES
 %# M4_YY_END_OF_BUFFER
 %# M4_YY_TRANS_OFFSET_TYPE
+%# M4_YY_TRAILING_MASK
+%# M4_YY_TRAILING_HEAD_MASK
 
 %#
 %#   Begin actual emission of code
@@ -942,7 +945,7 @@ m4_ifdef( [[M4_YYTEXT_IS_ARRAY]],
 #define YY_NUM_RULES M4_YY_NUM_RULES
 #define YY_END_OF_BUFFER M4_YY_END_OF_BUFFER
 
-me_ifndef( [[M4_YY_FULLSPD]], [[
+me_ifndef(  [[M4_YY_FULLSPD]], [[
 /* This struct is not used in this scanner */
 /* but its presence is necessary. */]]
 )
@@ -952,9 +955,125 @@ struct yy_trans_info
     flex_int[[M4_YY_TRANS_OFFSET_TYPE]]_t yy_next;
 }
 
-%# TODO: A breakpoint is still needed here to output the tables.  Don't know what its number will be yet.
-%% [T.K] Placeholder for actual table emission.  Number TBD.
+%# TODO: The tables have to be output here, but the code to do it is a mess of spaghetti.
+%#       It looks like it'll work best to create commands like %tables-yydmap that dump
+%#       the individual tables.  The gen.c functions will write the tables into buffers
+%#       the same way we do the table map.
+%#
+%#       In the meantime, we need to ensure that defines for the various table options get
+%#       propogated into the output stream so we can test them here in the skeleton.
+%#
+%#       In other words, gen.c:1611-1742, 1750-1757 goes here
 
+
+%if-c-only
+m4_ifdef( [[M4_YY_REENTRANT]], [[
+    extern int yy_flex_debug;
+m4_ifdef( [[M4_FLEX_DEBUG]],
+          [[int yy_flex_debug = 1;]],
+          [[int yy_flex_debug = 0;]] )
+]])
+$endif
+
+m4_ifdef( [[M4_YY_USES_REJECT]],
+[[
+		/* Declare state buffer variables. */
+%if-c-only
+m4_ifdef( [[M4_YY_REENTRANT]],
+[[
+			static yy_state_type *yy_state_buf=0, *yy_state_ptr=0;
+			static char *yy_full_match;
+			static int yy_lp;
+]] )
+%endif
+
+m4_ifdef( [[M4_YY_VARIABLE_TRAILING_CONTEXT_RULES]],
+[[
+%if-c-only
+			static int yy_looking_for_trail_begin = 0;
+			static int yy_full_lp;
+			static int *yy_full_state;
+%endif
+]] )
+			#define YY_TRAILING_MASK M4_YY_TRAILING_MASK
+			#define YY_TRAILING_HEAD_MASK M4_YY_TRAILING_HEAD_MASK
+		}
+
+		#define REJECT \
+		{ \
+		*yy_cp = YY_G(yy_hold_char); /* undo effects of setting up yytext */ \
+		yy_cp = YY_G(yy_full_match); /* restore poss. backed-over text */ \
+m4_ifdef( [[M4_VARIABLE_TRAILING_CONTEXT_RULES]], [[ \
+			YY_G(yy_lp) = YY_G(yy_full_lp); /* restore orig. accepting pos. */ \
+			YY_G(yy_state_ptr) = YY_G(yy_full_state); /* restore orig. state */ \
+			yy_current_state = *YY_G(yy_state_ptr); /* restore curr. state */ \ ]] )
+		++YY_G(yy_lp); \
+		goto find_rule; \
+		}
+]],
+[[
+		/* The intent behind this definition is that it'll catch
+		 * any uses of REJECT which flex missed.
+		 */
+		#define REJECT reject_used_but_not_detected
+]] )
+
+m4_ifdef( [[M4_YY_MORE_USED]], [[
+%if-c-only
+m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[
+    m4_ifdef( [[M4_YY_REENTRANT]], [[]], [[
+    		static int yy_more_offset = 0;
+            static int yy_prev_more_offset = 0;
+    ]] )
+]],
+[[
+m4_ifdef( [[M4_YY_REENTRANT]], [[]], [[
+			static int yy_more_flag = 0;
+			static int yy_more_len = 0;
+]] )
+]] )
+%endif
+
+m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[
+			#define yymore() (YY_G(yy_more_offset) = yy_flex_strlen( yytext M4_YY_CALL_LAST_ARG))
+			#define YY_NEED_STRLEN
+			#define YY_MORE_ADJ 0
+			#define YY_RESTORE_YY_MORE_OFFSET \
+			{ \
+                YY_G(yy_more_offset) = YY_G(yy_prev_more_offset); \
+                yyleng -= YY_G(yy_more_offset); \
+			}
+]],
+[[
+			#define yymore() (YY_G(yy_more_flag) = 1)
+			#define YY_MORE_ADJ YY_G(yy_more_len)
+			#define YY_RESTORE_YY_MORE_OFFSET
+]] )
+]],
+[[
+		#define yymore() yymore_used_but_not_detected
+		#define YY_MORE_ADJ 0
+		#define YY_RESTORE_YY_MORE_OFFSET
+]] )
+
+%if-c-only
+m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[
+			#ifndef YYLMAX
+			#define YYLMAX 8192
+			#endif
+m4_ifdef( [[M4_YY_REENTRANT]], [[]], [[
+            char yytext[YYLMAX];
+            char *yytext_ptr;
+]] )
+]],
+[[
+m4_ifdef( [[M4_YY_REENTRANT]], [[]], [[char *yytext;]] )
+]] )
+%endif
+
+
+%# TODO: Insert at this point the equivalents of gen.c:1879-1884.
+%% [TK] the user's section 1 definitions go here
 ]])
 
 m4_ifdef( [[M4_YY_IN_HEADER]], [[#ifdef YY_HEADER_EXPORT_START_CONDITIONS]])
@@ -1316,6 +1435,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
 %% [5.0] fread()/read() definition of YY_INPUT goes here unless we're doing C++ \
+%# TODO: translate gen.c:1891-1935 here
 \
 %if-c++-only C++ definition \
 	if ( (int)(result = LexerInput( (char *) buf, max_size )) < 0 ) \
