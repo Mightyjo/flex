@@ -663,6 +663,16 @@ void out_m4_define_dec (const char* def, const int val)
     fprintf(stdout, fmt, def, val);
 }
 
+/** Print "m4_define( [[def]], 0x[[val]])m4_dnl\n".
+ * @param def The m4 symbol to define.
+ * @param val The definition; may be NULL.
+ */
+void out_m4_define_hex (const char* def, const unsigned int val)
+{
+    const char * fmt = "m4_define( [[%s]], [[0x%x]])m4_dnl\n";
+    fprintf(stdout, fmt, def, val);
+}
+
 /* readable_form - return the the human-readable form of a character
  *
  * The returned string is in static storage.
