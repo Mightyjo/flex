@@ -1888,7 +1888,7 @@ void make_tables (void)
 
 	skelout ();		/* %% [5.0] - break point in skel */
 
-	if (!C_plus_plus) {
+/*	if (!C_plus_plus) {
 		if (use_read) {
 			outn ("\terrno=0; \\");
 			outn ("\twhile ( (result = (int) read( fileno(yyin), buf, (yy_size_t) max_size )) < 0 ) \\");
@@ -1933,10 +1933,14 @@ void make_tables (void)
 			outn ("\t\t}\\");
 		}
 	}
+*/
+    if (use_read) {
+        out_m4_define("M4_YY_USE_READ");
+    }
+    
+/*	skelout ();		/* %% [6.0] - break point in skel */
 
-	skelout ();		/* %% [6.0] - break point in skel */
-
-	indent_puts ("#define YY_RULE_SETUP \\");
+/*	indent_puts ("#define YY_RULE_SETUP \\");
 	++indent_level;
 	if (bol_needed) {
 		indent_puts ("if ( yyleng > 0 ) \\");
@@ -1947,7 +1951,12 @@ void make_tables (void)
 	}
 	indent_puts ("YY_USER_ACTION");
 	--indent_level;
-
+*/
+    if (bol_needed) {
+        out_m4_define("M4_YY_BOL_NEEDED");
+    }
+    
+    /* This one might be needed because of the action_array output */
 	skelout ();		/* %% [7.0] - break point in skel */
 
 	/* Copy prolog to output file. */
@@ -1957,7 +1966,7 @@ void make_tables (void)
 
 	skelout ();		/* %% [8.0] - break point in skel */
 
-	set_indent (2);
+/*	set_indent (2);
 
 	if (yymore_used && !yytext_is_array) {
 		indent_puts ("YY_G(yy_more_len) = 0;");
@@ -1970,14 +1979,14 @@ void make_tables (void)
 		indent_puts ("}");
 		--indent_level;
 	}
+*/
+/*	skelout ();		/* %% [9.0] - break point in skel */
 
-	skelout ();		/* %% [9.0] - break point in skel */
-
-	gen_start_state ();
-
+/*	gen_start_state ();
+*
 	/* Note, don't use any indentation. */
-	outn ("yy_match:");
-	gen_next_match ();
+/*	outn ("yy_match:");
+*/	gen_next_match ();
 
 	skelout ();		/* %% [10.0] - break point in skel */
 	set_indent (2);

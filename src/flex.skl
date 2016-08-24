@@ -163,6 +163,8 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)
 %# m4_undef( [[M4_YY_NO_GET_LLOC]] )
 %# m4_undef( [[M4_YY_NO_SET_LLOC]] )
 %# m4_undef( [[M4_YY_VARIABLE_TRAILING_CONTEXT_RULES]] )
+%# m4_undef( [[M4_YY_USE_READ]] )
+%# m4_undef( [[M4_YY_BOL_NEEDED]] )
 
 %# The skeleton uses the following macros during state table generation.
 %# Skeleton authors must determine how to translate these values into
@@ -1514,8 +1516,50 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-%% [5.0] fread()/read() definition of YY_INPUT goes here unless we're doing C++ \
-%# TODO: translate gen.c:1891-1935 here
+%# %% [5.0] fread()/read() definition of YY_INPUT goes here unless we're doing C++ \
+%if-c-only \
+m4_ifdef( [[M4_YY_USE_READ]], [[ \
+	errno=0; \
+	while ( (result = (int) read( fileno(yyin), buf, (yy_size_t) max_size )) < 0 ) \
+	{ \
+		if( errno != EINTR) \
+		{ \
+			YY_FATAL_ERROR( \"input in flex scanner failed\" ); \
+			break; \
+		} \
+		errno=0; \
+		clearerr(yyin); \
+	} \
+]], [[ \
+    if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
+	{ \
+		int c = '*'; \
+		int n; \
+		for ( n = 0; n < max_size && \
+			(c = getc( yyin )) != EOF && c != '\\n'; ++n ) \
+			buf[n] = (char) c; \
+			if ( c == '\\n' ) \
+                buf[n++] = (char) c; \
+			if ( c == EOF && ferror( yyin ) ) \
+                YY_FATAL_ERROR( \"input in flex scanner failed\" ); \
+			result = n; \
+	} \
+	else \
+	{ \
+        errno=0; \
+		while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) \
+		{ \
+			if( errno != EINTR) \
+			{ \
+                YY_FATAL_ERROR( \"input in flex scanner failed\" ); \
+                break; \
+			} \
+            errno=0; \
+            clearerr(yyin); \
+        } \
+	} \
+]] ) \
+%endif \
 \
 %if-c++-only C++ definition \
 	if ( (int)(result = LexerInput( (char *) buf, max_size )) < 0 ) \
@@ -1653,7 +1697,13 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
-%% [6.0] YY_RULE_SETUP definition goes here
+%# %% [6.0] YY_RULE_SETUP definition goes here
+#define YY_RULE_SETUP \
+m4_ifdef( [[M4_YY_BOL_NEEDED]], [[ \
+	if ( yyleng > 0 ) \
+        YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (yytext[yyleng - 1] == '\\n'); \
+]], [[]] ) \
+	YY_USER_ACTION
 ]])
 
 %not-for-header
@@ -1734,11 +1784,21 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 		}
 
 	{
+%# This one might be needed because of the action_array output
 %% [7.0] user's declarations go here
-
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
-%% [8.0] yymore()-related code goes here
+%# %% [8.0] yymore()-related code goes here
+m4_ifdef( [[M4_YY_MORE_USED]], 
+m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], [[
+        YY_G(yy_more_len) = 0;
+		if ( YY_G(yy_more_flag) )
+		{
+            YY_G(yy_more_len) = (int) (YY_G(yy_c_buf_p) - YY_G(yytext_ptr));
+            YY_G(yy_more_flag) = 0;
+		}
+]], [[]] ),
+[[]] )
 		yy_cp = YY_G(yy_c_buf_p);
 
 		/* Support of yytext. */
@@ -1750,6 +1810,28 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 		yy_bp = yy_cp;
 
 %% [9.0] code to set up and find next match goes here
+m4_ifdef( [[M4_YY_FULLSPD]], [[
+m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
+		yy_current_state = yy_start_state_list[YY_G(yy_start) + YY_AT_BOL()];
+]], [[
+		yy_current_state = yy_start_state_list[YY_G(yy_start)];
+]] )
+]],[[
+        yy_current_state = YY_G(yy_start);
+
+	m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
+		yy_current_state += YY_AT_BOL();
+    ]], [[]] )
+
+	m4_ifdef( [[M4_YY_USES_REJECT]], [[
+		/* Set up for storing up states. */
+		YY_G(yy_state_ptr) = YY_G(yy_state_buf);
+		*YY_G(yy_state_ptr)++ = yy_current_state;
+	]], [[]] )
+]] )
+
+yy_match:
+%# TODO: gen.c:1989 Translate gen_next_match here.
 
 yy_find_action:
 %% [10.0] code to find the action number goes here
