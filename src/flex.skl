@@ -1626,6 +1626,48 @@ m4_ifdef( [[M4_YY_BOL_NEEDED]], [[ \
 	YY_USER_ACTION
 ]])
 
+%# M4_YY_NEEDS_BACKING_UP is set gen.c:make_tables() if num_backing_up > 0.
+#define YY_BACKING_UP \
+m4_ifdef( [[M4_YY_USES_REJECT]], [[;]], [[ \
+  m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[;]], [[ \
+    m4_ifdef( [[M4_YY_FULLSPD]], [[ \
+      if ( yy_current_state[-1].yy_nxt ) \
+	]], [[ \
+	  if ( yy_accept[yy_current_state] ) \
+    ]]) \
+    { \
+	  YY_G(yy_last_accepting_state) = yy_current_state; \
+	  YY_G(yy_last_accepting_cpos) = yy_cp; \
+	}
+  ]])
+]])
+
+%# The ifndefs around fullspd and fulltbl are uglier than I'd like.
+%# They mean if(fullspd||fulltbl){add 1 to the last cpos} else {just use the last cpos}.
+%# I don't remember how to write that more directly tonight, so we get the not-and-not version.
+#define YY_BU_ACTION \
+m4_ifdef( [[M4_YY_USES_REJECT]], [[;]], [[ \
+  m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[;]], [[ \
+    case 0: /* must back up */ \
+	        /* undo the effects of YY_DO_BEFORE_ACTION */ \
+	        *yy_cp = YY_G(yy_hold_char); \
+    m4_ifndef( [[M4_YY_FULLSPD]], m4_ifndef( [[M4_YY_FULLTBL]], [[ \
+            /* Backing-up info for compressed tables is taken after \
+		     * yy_cp has been incremented for the next state. \
+		     */ \
+		    yy_cp = YY_G(yy_last_accepting_cpos); \
+        ]], [[ \
+            yy_cp = YY_G(yy_last_accepting_cpos) + 1; \
+        ]]), [[ \
+            yy_cp = YY_G(yy_last_accepting_cpos) + 1; \
+    ]]) \
+		    yy_current_state = YY_G(yy_last_accepting_state); \
+	        goto yy_find_action; \
+	        \
+  ]])
+]])   
+    
+
 %not-for-header
 /** The main scanner function which does all the work.
  */
