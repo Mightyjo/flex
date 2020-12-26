@@ -517,7 +517,8 @@ void ntod (void)
 					    sizeof (flex_int32_t));
 		yynxt_curr = 0;
 
-		buf_prints (&yydmap_buf,  "YYDMAP_ENTRY( %s, %s )", "YYTD_ID_NXT", "yy_nxt");
+		buf_printns (&yydmap_buf, "YYDMAP_ENTRY( %s, %s )", 2, 
+		        "YYTD_ID_NXT", "yy_nxt");
 
 		/* Unless -Ca, declare it "short" because it's a real
 		 * long-shot that that won't be large enough.
