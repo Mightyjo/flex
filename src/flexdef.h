@@ -1055,6 +1055,7 @@ extern struct Buf *buf_strappend(struct Buf *, const char *str);
 extern struct Buf *buf_strnappend(struct Buf *, const char *str, int nchars);
 extern struct Buf *buf_strdefine(struct Buf * buf, const char *str, const char *def);
 extern struct Buf *buf_prints(struct Buf *buf, const char *fmt, const char* s);
+extern struct Buf *buf_printns(struct Buf *buf, const char *fmt, const int count, ...);
 extern struct Buf *buf_m4_define(struct Buf *buf, const char* def, const char* val);
 extern struct Buf *buf_m4_undefine(struct Buf *buf, const char* def);
 extern struct Buf *buf_print_strings(struct Buf * buf, FILE* out);
