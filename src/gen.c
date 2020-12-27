@@ -1553,7 +1553,7 @@ void make_tables (void)
     out_m4_define_dec("M4_YY_NUM_RULES", num_rules);
     out_m4_define_dec("M4_YY_END_OF_BUFFER", num_rules + 1);
     if( num_backing_up > 0 ) {
-        out_m4_define("M4_YY_NEEDS_BACKING_UP");
+        out_m4_define("M4_YY_NEEDS_BACKING_UP", NULL);
     }
 /*
 	out_dec ("#define YY_NUM_RULES %d\n", num_rules);
@@ -1942,7 +1942,7 @@ void make_tables (void)
 	}
 */
     if (use_read) {
-        out_m4_define("M4_YY_USE_READ");
+        out_m4_define("M4_YY_USE_READ", NULL);
     }
     
 /*	skelout ();		/* %% [6.0] - break point in skel */
@@ -1960,7 +1960,7 @@ void make_tables (void)
 	--indent_level;
 */
     if (bol_needed) {
-        out_m4_define("M4_YY_BOL_NEEDED");
+        out_m4_define("M4_YY_BOL_NEEDED", NULL);
     }
     
     /* This one might be needed because of the action_array output */
