@@ -897,6 +897,7 @@ extern void outc(int);
 extern void outn(const char *);
 extern void out_m4_define(const char* def, const char* val);
 extern void out_m4_define_dec(const char* def, const int val);
+extern void out_m4_define_hex(const char* def, const unsigned int val);
 
 /* Return a printable version of the given character, which might be
  * 8-bit.
