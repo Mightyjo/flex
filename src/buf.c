@@ -94,7 +94,7 @@ struct Buf *buf_printns (struct Buf *buf, const char *fmt, const int count, ...)
 	va_start(ap, count);
 	tsz = strlen(fmt);
 	for(int i=0; i<count; ++i) {
-	    va_arg(s, const char*);
+	    s = va_arg(ap, const char*);
 		tsz += strlen(s);
 	}
 	va_end(ap);
