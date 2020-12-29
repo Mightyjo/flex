@@ -64,38 +64,49 @@ m4_changequote([[, ]])
 %#   Skeleton authors must alter these to conform to their target language.
 
 %#   Define the standard input and output files, with and without initialization.
-m4_define( [[M4_YY_STDINIT]], [[FILE *yyin = stdin, *yyout = stdout;]] )
-m4_define( [[M4_YY_NO_STDINIT]], [[FILE *yyin = NULL, *yyout = NULL;]] )
+m4_define( [[M4_YY_STDINIT]], [[
+    FILE *yyin=stdin, *yyout=stdout;
+]] )
+m4_define( [[M4_YY_NO_STDINIT]], [[
+    FILE *yyin=NULL, *yyout=NULL;
+]] )
 
 %#   Defines table alignment macro.  
 %#   The test macro is defined when the -Ca command line argument is specified.
 %#   Possibly only useful in skeletons for C/C++ and kin.
-m4_ifdef([[M4_YY_LONG_ALIGNED]],
-#define YY_INT_ALIGNED flex_int32_t,
+m4_ifdef([[M4_YY_LONG_ALIGNED]], [[
+#define YY_INT_ALIGNED flex_int32_t]], [[
 #define YY_INT_ALIGNED flex_int16_t
-)
+]] )
 
 %#   Defines a table with a parameterized name and dimension.
 %#      /param1 - name of the table
 %#      /param2 - number of rows
-m4_define( [[DEFINE_TABLE_2D]], [[static const YY_INT_ALIGNED $1 [][$2] =\n    {\n]] )
+m4_define( [[DEFINE_TABLE_2D]], [[static yyconst YY_INT_ALIGNED $1 [][$2] =
+{
+]] )
 
 %#   Defines an array with a parameterized name and dimension.
 %#      /param1 - name of the table
 %#      /param2 - number of cells
-m4_define( [[DEFINE_ARRAY]], [[static const YY_INT_ALIGNED $1 [$2] =\n    {\n]] )
+m4_define( [[DEFINE_ARRAY]], [[static yyconst YY_INT_ALIGNED $1 [$2] =
+{
+]] )
 
 %#   Like DEFINE_TABLE, but for strictly empty tables
 %#      /param1 - name of the table
-m4_define( [[DEFINE_TABLE_EMPTY]], [[static const YY_INT_ALIGNED * $1 = 0;\n]] )
+m4_define( [[DEFINE_TABLE_EMPTY]], [[static yyconst YY_INT_ALIGNED * $1 = 0;
+]] )
 
 %#   Defines the end-of-table syntax
 m4_define( [[END_TABLE]], [[}]] )
 
 %#   Defines the row separator syntax
 m4_define( [[BEGIN_ROW]], [[{]] )
-m4_define( [[END_ROW]], [[},\n]] )
-m4_define( [[LAST_ROW]], [[} ;\n]] )
+m4_define( [[END_ROW]], [[},
+]] )
+m4_define( [[LAST_ROW]], [[} ;
+]] )
 
 %#   Defines the column separator syntax
 m4_define( [[COLUMN_SEPARATOR]], [[,]] )
@@ -106,16 +117,20 @@ m4_define( [[TABLE_DATA]], [[$1]] )
 
 %#   Defines spacing for pretty-printing tables
 m4_define( [[INDENT]], [[    ]] )
-m4_define( [[TABLE_BLOCK]], [[\n]] )
+m4_define( [[TABLE_BLOCK]], [[
+]] )
 
 %#   Defines an entry in the table map emitted by the %tables-yydmap command
 %#      /param1 - A table ID constant
 %#      /param2 - A handle for a table, usually a symbol/name/etc
-m4_define( [[YYDMAP_ENTRY]], [[\t{$1, (void**)&$2, sizeof(YY_INT_ALIGNED)},\n]] )
+m4_define( [[YYDMAP_ENTRY]], [[ {$1, (void**)&$2, sizeof(YY_INT_ALIGNED)},
+]] )
 
 %#   Redefines the YY_NXT_LOLEN constant used to index tables in the C/C++ scanner
 %#      /param1 - the new (integer) value of YY_NXT_LOLEN
-m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)\n]] )
+m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN
+#define YY_NXT_LOLEN ($1)
+]] )
 
 
 %#   The skeleton uses the following macros to implement CLI switch-controlled emissions.
@@ -184,116 +199,32 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN ($1)
 %#
 
 %#   Emit the user-defined top block from the input.
-m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK, [[]])
+m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK )
 
 %#   Emit any user-defined constants from the input or command line.
 m4_ifdef( [[M4_YY_MAIN]], [[#define YY_MAIN 1]], [[#define YY_MAIN 0]] )
-m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF, [[]])
+m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF )
 
 %#   Emit the right definitions for yywrap
-m4_ifndef( [[M4_YY_SKIP_YYWRAP]],
 %if-c-only
-  m4_ifdef( [[M4_YY_REENTRANT]],
-            [[#define yywrap(yyscanner) (/*CONSTCOND*/1)]],
-            [[#define yywrap() (/*CONSTCOND*/1)]] )
+m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
+  m4_ifdef( [[M4_YY_REENTRANT]], [[
+    #define yywrap(yyscanner) (/*CONSTCOND*/1)]], [[
+    #define yywrap() (/*CONSTCOND*/1)]] )
+]] )
 %endif
-)
 
 %#   Enable debugging, or not
 m4_ifdef( [[M4_FLEX_DEBUG]], [[#define FLEX_DEBUG (/*CONSTCOND*/1)]] )
 
-%#   Define the flex_uint8_t type
-m4_ifdef( [[M4_YY_IN_HEADER]], , [[typedef flex_uint8_t YY_CHAR;]] )
 
-%#   Define the yytext_ptr macro, if needed
-m4_ifdef( [[M4_YYTEXT_PTR]], [[#define yytxp_ptr yytext]] )
 
-%#   Decide what to emit regarding the standard input and output files.
-m4_ifdef( [[M4_YY_IN_HEADER]], , [[
-    m4_ifdef( [[M4_DO_STDINIT]], [[
-      m4_ifdef( [[M4_YY_REENTRANT]], [[
-                #ifdef VMS
-                  #ifdef __VMS_POSIX
-                    #define YY_STDINIT
-                  #endif
-                #else
-                  #define YY_STDINIT
-                #endif
-                ]] )
-      #ifdef VMS
-        #ifndef __VMS_POSIX
-          M4_YY_NO_STDINIT
-        #else
-          M4_YY_STDINIT
-        #endif
-      #else
-        M4_YY_STDINIT
-      #endif
-              ]],
-              [[
-    m4_ifndef( [[M4_YY_REENTRANT]], [[M4_YY_STDINIT]] )        
-              ]] )
-]] )
 
-%#  Define what to emit for the -F CLI swtich
-m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
-  m4_ifdef( [[M4_YY_FULLSPD]], 
-            [[typedef yyconst struct yy_trans_info *yy_state_type;]],
-            [[%if-c-only
-              typedef int yy_state_type;
-              %endif]] )
-]])
 
 %#   Define handling for the --lex-compat flag
 m4_ifdef( [[M4_LEX_COMPAT]], [[#define YY_FLEX_LEX_COMPAT]] )
 
-%#   Define yylineno for C
-%if-c-only
-m4_ifndef( [[M4_YY_REENTRANT]], [[
-    extern int yylineno;
-  m4_ifdef( [[M4_YY_IN_HEADER]], , [[
-	int yylineno = 1;
-    ]])
-]] )
-%endif
 
-%#   Define C++ specifics
-%#   main.c:1705
-%if-c++-only
-#include <FlexLexer.h>
-
-m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
-int yyFlexLexer::yywrap() { return 1; }
-]])
-
-m4_ifdef( [[M4_YYCLASS]], [[
-int yyFlexLexer::yylex()
-{
-    LexerError( "yyFlexLexer::yylex invoked but %option yyclass used" );
-    return 0;
-}
-
-#define YY_DECL int M4_YYCLASS::yylex()
-]])
-%endif
-
-%#   Define yytxp_ptr in C 
-%#    main.c:1724
-%if-c-only
-m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], 
-          [[m4_ifndef( [[M4_YY_REENTRANT]], [[extern char yytext[];]] ) ]],
-		  [[m4_ifdef( [[M4_YY_REENTRANT]], 
-                      [[#define yytext_ptr yytext_r]], 
-                      [[
-                      extern char *yytext;
-                      
-                      #ifdef yytext_ptr
-                        #undef yytext_ptr
-                      #endif
-                      #define yytext_ptr yytext
-                      ]])
-          ]])
-%endif
 
 
 %not-for-header
@@ -338,19 +269,19 @@ m4_ifelse(M4_YY_PREFIX,yy,,
 #endif
 
 %# Some negated symbols
-m4_ifdef( [[M4_YY_IN_HEADER]], , [[m4_define([[M4_YY_NOT_IN_HEADER]], [[]])]])
-m4_ifdef( [[M4_YY_REENTRANT]], , [[m4_define([[M4_YY_NOT_REENTRANT]], [[]])]])
+m4_ifdef( [[M4_YY_IN_HEADER]], , [[m4_define( [[M4_YY_NOT_IN_HEADER]], [[]] )]] )
+m4_ifdef( [[M4_YY_REENTRANT]], , [[m4_define( [[M4_YY_NOT_REENTRANT]], [[]] )]] )
 
 %# This is the m4 way to say "(stack_used || is_reentrant)
-m4_ifdef( [[M4_YY_STACK_USED]], [[m4_define([[M4_YY_HAS_START_STACK_VARS]])]])
-m4_ifdef( [[M4_YY_REENTRANT]],  [[m4_define([[M4_YY_HAS_START_STACK_VARS]])]])
+m4_ifdef( [[M4_YY_STACK_USED]], [[m4_define( [[M4_YY_HAS_START_STACK_VARS]] )]] )
+m4_ifdef( [[M4_YY_REENTRANT]],  [[m4_define( [[M4_YY_HAS_START_STACK_VARS]] )]] )
 
 %# Prefixes.
 %# The complexity here is necessary so that m4 preserves
 %# the argument lists to each C function.
 
 
-m4_ifdef( [[M4_YY_PREFIX]],, [[m4_define([[M4_YY_PREFIX]], [[yy]])]])
+m4_ifdef( [[M4_YY_PREFIX]],, [[m4_define( [[M4_YY_PREFIX]], [[yy]] )]] )
 
 m4preproc_define(`M4_GEN_PREFIX',``
 [[#ifdef yy$1
@@ -408,7 +339,7 @@ m4_ifelse(M4_YY_PREFIX,yy,,
     [[
         M4_GEN_PREFIX(`get_column')
         M4_GEN_PREFIX(`set_column')
-    ]])
+    ]] )
     M4_GEN_PREFIX(`wrap')
 )
 %endif
@@ -417,13 +348,13 @@ m4_ifdef( [[M4_YY_BISON_LVAL]],
 [[
     M4_GEN_PREFIX(`get_lval')
     M4_GEN_PREFIX(`set_lval')
-]])
+]] )
 
 m4_ifdef( [[<M4_YY_BISON_LLOC>]],
 [[
     M4_GEN_PREFIX(`get_lloc')
     M4_GEN_PREFIX(`set_lloc')
-]])
+]] )
 
 
 m4_ifelse(M4_YY_PREFIX,yy,,
@@ -452,7 +383,7 @@ m4_ifdef( [[M4_YY_TABLES_EXTERNAL]],
     M4_GEN_PREFIX(`tables_fload')
     M4_GEN_PREFIX(`tables_destroy')
     M4_GEN_PREFIX(`TABLES_NAME')
-]])
+]] )
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
 
@@ -501,6 +432,96 @@ m4_ifdef( [[M4_YY_ALWAYS_INTERACTIVE]], ,
 %if-c-or-c++
 m4preproc_include(`flexint.h')
 m4preproc_include(`flexint_shared.h')
+%endif
+
+%#   Define the flex_uint8_t type
+m4_ifdef( [[M4_YY_IN_HEADER]], , [[typedef flex_uint8_t YY_CHAR;]] )
+
+%#   Define the yytext_ptr macro, if needed
+m4_ifdef( [[M4_YYTEXT_PTR]], [[#define yytxp_ptr yytext]] )
+
+%#   Decide what to emit regarding the standard input and output files.
+m4_ifdef( [[M4_YY_IN_HEADER]], , [[
+    m4_ifdef( [[M4_DO_STDINIT]], [[
+      m4_ifdef( [[M4_YY_REENTRANT]], [[
+                #ifdef VMS
+                  #ifdef __VMS_POSIX
+                    #define YY_STDINIT
+                  #endif
+                #else
+                  #define YY_STDINIT
+                #endif
+                ]] )
+      #ifdef VMS
+        #ifndef __VMS_POSIX
+          M4_YY_NO_STDINIT
+        #else
+          M4_YY_STDINIT
+        #endif
+      #else
+        M4_YY_STDINIT
+      #endif
+              ]],
+              [[
+    m4_ifdef( [[M4_YY_REENTRANT]], , [[M4_YY_STDINIT]] )        
+              ]] )
+]] )
+
+%#  Define what to emit for the -F CLI swtich
+m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
+  m4_ifdef( [[M4_YY_FULLSPD]], 
+            [[typedef yyconst struct yy_trans_info *yy_state_type;]] )
+]] )
+%if-c-only
+m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
+  m4_ifdef( [[M4_YY_FULLSPD]], , [[typedef int yy_state_type;]] )
+]] )
+%endif
+
+%#   Define yylineno for C
+%if-c-only
+m4_ifdef( [[M4_YY_REENTRANT]], , [[
+    extern int yylineno;
+  m4_ifdef( [[M4_YY_IN_HEADER]], , [[
+	int yylineno = 1;
+    ]] )
+]] )
+%endif
+
+%#   Define C++ specifics
+%if-c++-only
+#include <FlexLexer.h>
+
+m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
+int yyFlexLexer::yywrap() { return 1; }
+]] )
+
+m4_ifdef( [[M4_YYCLASS]], [[
+int yyFlexLexer::yylex()
+{
+    LexerError( "yyFlexLexer::yylex invoked but %option yyclass used" );
+    return 0;
+}
+
+#define YY_DECL int M4_YYCLASS::yylex()
+]] )
+%endif
+
+%#   Define yytxp_ptr in C 
+%if-c-only
+m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], 
+          [[m4_ifndef( [[M4_YY_REENTRANT]], [[extern char yytext[];]] ) ]],
+		  [[m4_ifdef( [[M4_YY_REENTRANT]], 
+                      [[#define yytext_ptr yytext_r]], 
+                      [[
+                      extern char *yytext;
+                      
+                      #ifdef yytext_ptr
+                        #undef yytext_ptr
+                      #endif
+                      #define yytext_ptr yytext
+                      ]] )
+          ]] )
 %endif
 
 #if defined(__GNUC__) && __GNUC__ >= 3
@@ -915,15 +936,15 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_DO_BEFORE_ACTION \
 	YY_G(yytext_ptr) = yy_bp; \
 %# %% [2.0] code to fiddle yytext and yyleng for yymore() goes here \
-m4_if( [[defined(M4_YY_USED) && !defined(M4_YYTEXT_IS_ARRAY)]],
-       [[
-	YY_G(yytext_ptr) -= YY_G(yy_more_len); \
-	yyleng = (int) (yy_cp - YY_G(yytext_ptr)); \
-       ]],
-       [[
-	yyleng = (int) (yy_cp - yy_bp); \
-       ]] 
-)
+m4_ifdef( [[M4_YY_USED]], [[ \
+  m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], [[ \
+    yyleng = (int) (yy_cp - yy_bp); \
+  ]], [[ \
+    YY_G(yytext_ptr) -= YY_G(yy_more_len); \
+    yyleng = (int) (yy_cp - YY_G(yytext_ptr)); \
+  ]] ) ]], [[ \
+    yyleng = (int) (yy_cp - yy_bp); \
+  ]] ) \
 	YY_G(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 %# %% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \
@@ -940,22 +961,22 @@ m4_ifdef( [[M4_YYTEXT_IS_ARRAY]],
 	YY_G(yy_more_offset) = 0; \]],
     [[yy_flex_strncpy( yytext, YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \]]
     )
-)
+) \
     YY_G(yy_c_buf_p) = yy_cp;
 
 %# %% [4.0] data tables for the DFA and the user's section 1 definitions go here
 #define YY_NUM_RULES M4_YY_NUM_RULES
 #define YY_END_OF_BUFFER M4_YY_END_OF_BUFFER
 
-me_ifndef(  [[M4_YY_FULLSPD]], [[
+m4_ifdef(  [[M4_YY_FULLSPD]], , [[
 /* This struct is not used in this scanner */
 /* but its presence is necessary. */]]
 )
 struct yy_trans_info
 {
-    flex_int[[M4_YY_TRANS_OFFSET_TYPE]]_t yy_verify;
-    flex_int[[M4_YY_TRANS_OFFSET_TYPE]]_t yy_next;
-}
+    flex_int[[]]M4_YY_TRANS_OFFSET_TYPE[[]]_t yy_verify;
+    flex_int[[]]M4_YY_TRANS_OFFSET_TYPE[[]]_t yy_next;
+};
 
 %# TODO: The tables have to be output here, but the code to do it is a mess of spaghetti.
 %#       It looks like it'll work best to create commands like %tables-yydmap that dump
@@ -975,7 +996,7 @@ m4_ifdef( [[M4_FLEX_DEBUG]],
           [[int yy_flex_debug = 1;]],
           [[int yy_flex_debug = 0;]] )
 ]])
-$endif
+%endif
 
 m4_ifdef( [[M4_YY_USES_REJECT]],
 [[
@@ -1444,7 +1465,7 @@ m4_ifdef( [[M4_YY_USE_READ]], [[ \
 	{ \
 		if( errno != EINTR) \
 		{ \
-			YY_FATAL_ERROR( \"input in flex scanner failed\" ); \
+			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 			break; \
 		} \
 		errno=0; \
@@ -1461,7 +1482,7 @@ m4_ifdef( [[M4_YY_USE_READ]], [[ \
 			if ( c == '\\n' ) \
                 buf[n++] = (char) c; \
 			if ( c == EOF && ferror( yyin ) ) \
-                YY_FATAL_ERROR( \"input in flex scanner failed\" ); \
+                YY_FATAL_ERROR( "input in flex scanner failed" ); \
 			result = n; \
 	} \
 	else \
@@ -1471,7 +1492,7 @@ m4_ifdef( [[M4_YY_USE_READ]], [[ \
 		{ \
 			if( errno != EINTR) \
 			{ \
-                YY_FATAL_ERROR( \"input in flex scanner failed\" ); \
+                YY_FATAL_ERROR( "input in flex scanner failed" ); \
                 break; \
 			} \
             errno=0; \
