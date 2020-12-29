@@ -292,13 +292,13 @@ void dataflush (void)
 	if (!gentables)
 		return;
 
-	out ("TABLE_BLOCK");
+	out ("TABLE_BLOCK ");
 
 	if (++dataline >= NUMDATALINES) {
 		/* Put out a blank line so that the table is grouped into
 		 * large blocks that enable the user to find elements easily.
 		 */
-		out ("TABLE_BLOCK");
+		out ("TABLE_BLOCK ");
 		dataline = 0;
 	}
 
@@ -447,7 +447,7 @@ void mk2data (int value)
 		return;
 
 	if (datapos >= NUMDATAITEMS) {
-		out ("COLUMN_SEPARATOR");
+		out ("COLUMN_SEPARATOR ");
 		dataflush ();
 	}
 
@@ -456,11 +456,11 @@ void mk2data (int value)
 		out ("INDENT ");
 
 	else
-		out ("COLUMN_SEPARATOR");
+		out ("COLUMN_SEPARATOR" );
 
 	++datapos;
 
-	out_dec ("TABLE_DATA(%5d)", value);
+	out_dec ("TABLE_DATA(%5d) ", value);
 }
 
 
@@ -476,7 +476,7 @@ void mkdata (int value)
 		return;
 
 	if (datapos >= NUMDATAITEMS) {
-		out ("COLUMN_SEPARATOR");
+		out ("COLUMN_SEPARATOR ");
 		dataflush ();
 	}
 
@@ -484,11 +484,11 @@ void mkdata (int value)
 		/* Indent. */
 		out ("INDENT ");
 	else
-		out ("COLUMN_SEPARATOR");
+		out ("COLUMN_SEPARATOR ");
 
 	++datapos;
 
-	out_dec ("TABLE_DATA(%5d)", value);
+	out_dec ("TABLE_DATA(%5d) ", value);
 }
 
 
