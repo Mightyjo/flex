@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/westes/flex.svg?branch=master)](https://travis-ci.org/westes/flex)
+[![Build Status](https://travis-ci.org/Mightyjo/flex.svg?branch=skel_purify)](https://travis-ci.org/Mightyjo/flex)
 
 This is flex, the fast lexical analyzer generator.
 
