@@ -64,12 +64,9 @@ m4_changequote([[, ]])
 %#   Skeleton authors must alter these to conform to their target language.
 
 %#   Define the standard input and output files, with and without initialization.
-m4_define( [[M4_YY_STDINIT]], [[
-    FILE *yyin=stdin, *yyout=stdout;
-]] )
-m4_define( [[M4_YY_NO_STDINIT]], [[
-    FILE *yyin=NULL, *yyout=NULL;
-]] )
+m4_define( [[M4_YY_STDFILES]], [[extern FILE *yyin, *yyout;]] )
+m4_define( [[M4_YY_STDINIT]], [[FILE *yyin=stdin, *yyout=stdout;]] )
+m4_define( [[M4_YY_NO_STDINIT]], [[FILE *yyin=NULL, *yyout=NULL;]] )
 
 %#   Defines table alignment macro.  
 %#   The test macro is defined when the -Ca command line argument is specified.
@@ -209,22 +206,20 @@ m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF )
 %if-c-only
 m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
   m4_ifdef( [[M4_YY_REENTRANT]], [[
-    #define yywrap(yyscanner) (/*CONSTCOND*/1)]], [[
-    #define yywrap() (/*CONSTCOND*/1)]] )
+    #define [[M4_YY_PREFIX]]wrap(yyscanner) (/*CONSTCOND*/1)]], [[
+    #define [[M4_YY_PREFIX]]wrap() (/*CONSTCOND*/1)]] )
 ]] )
 %endif
 
 %#   Enable debugging, or not
-m4_ifdef( [[M4_FLEX_DEBUG]], [[#define FLEX_DEBUG (/*CONSTCOND*/1)]] )
-
-
-
+m4_ifdef( [[M4_FLEX_DEBUG]], [[#define FLEX_DEBUG (/*CONSTCOND*/1)]], [[
+  m4_define( [[M4_YY_NO_GET_DEBUG]], 1 )
+  m4_define( [[M4_YY_NO_SET_DEBUG]], 1 )
+]])
 
 
 %#   Define handling for the --lex-compat flag
 m4_ifdef( [[M4_LEX_COMPAT]], [[#define YY_FLEX_LEX_COMPAT]] )
-
-
 
 
 %not-for-header
@@ -440,32 +435,20 @@ m4_ifdef( [[M4_YY_IN_HEADER]], , [[typedef flex_uint8_t YY_CHAR;]] )
 %#   Define the yytext_ptr macro, if needed
 m4_ifdef( [[M4_YYTEXT_PTR]], [[#define yytxp_ptr yytext]] )
 
-%#   Decide what to emit regarding the standard input and output files.
-m4_ifdef( [[M4_YY_IN_HEADER]], , [[
-    m4_ifdef( [[M4_DO_STDINIT]], [[
-      m4_ifdef( [[M4_YY_REENTRANT]], [[
-                #ifdef VMS
-                  #ifdef __VMS_POSIX
-                    #define YY_STDINIT
-                  #endif
-                #else
-                  #define YY_STDINIT
-                #endif
-                ]] )
-      #ifdef VMS
-        #ifndef __VMS_POSIX
-          M4_YY_NO_STDINIT
-        #else
-          M4_YY_STDINIT
-        #endif
-      #else
-        M4_YY_STDINIT
-      #endif
-              ]],
-              [[
-    m4_ifdef( [[M4_YY_REENTRANT]], , [[M4_YY_STDINIT]] )        
-              ]] )
-]] )
+%#   Declare the standard yyin and yyout files
+m4_ifdef( [[M4_YY_IN_HEADER]], [[M4_YY_STDFILES]], [[
+  m4_ifdef( [[M4_DO_STDINIT]], [[
+    m4_ifdef( [[M4_YY_REENTRANT]], [[
+#ifdef VMS
+  #ifdef __VMS_POSIX
+    #define YY_STDINIT
+  #endif
+#else
+  #define YY_STDINIT
+#endif
+    ]])
+  ]])
+]])
 
 %#  Define what to emit for the -F CLI swtich
 m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
@@ -682,9 +665,11 @@ extern int yyleng;
 
 %if-c-only
 %if-not-reentrant
-extern FILE *yyin, *yyout;
+M4_YY_NO_STDINIT
 %endif
 %endif
+
+
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
@@ -2294,6 +2279,7 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 %endif
 {
 	int yy_is_jam;
+        char *yy_cp = YY_G(yy_c_buf_p);
     M4_YY_DECL_GUTS_VAR(); /* This var may be unused depending upon options. */
 %% [17.0] code to find the next state, and perhaps do backing up, goes here
 

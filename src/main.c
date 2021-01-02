@@ -1617,147 +1617,37 @@ void readin (void)
     }
 
 	if (!do_yywrap) {
-        /*
-		if (!C_plus_plus) {
-			 if (reentrant)
-				out_str ("\n#define %swrap(yyscanner) (/*CONSTCOND*/1)\n", prefix);
-			 else
-				out_str ("\n#define %swrap() (/*CONSTCOND*/1)\n", prefix);
-		}
-        */
-		/* outn ("#define YY_SKIP_YYWRAP"); */
         out_m4_define( "M4_YY_SKIP_YYWRAP", NULL );
 	}
 
 	if (ddebug)
-		/* outn ("\n#define FLEX_DEBUG"); */
         out_m4_define( "M4_FLEX_DEBUG", NULL );
-
-    /*
-	OUT_BEGIN_CODE ();
-	outn ("typedef flex_uint8_t YY_CHAR;");
-	OUT_END_CODE ();
-    */
     
 	if (C_plus_plus) {
-		/* outn ("#define yytext_ptr yytext"); */
         out_m4_define( "M4_YYTEXT_PTR", NULL );
 
-		if (interactive)
-			/* outn ("#define YY_INTERACTIVE"); */
+	    if (interactive)
             out_m4_define( "M4_YY_INTERACTIVE", NULL );
 	}
-
 	else {
-		/* OUT_BEGIN_CODE (); */
-		/* In reentrant scanner, stdinit is handled in flex.skl. */
-		if (do_stdinit) {
-            out_m4_define( "M4_DO_STDINIT", NULL );
-            /*
-			if (reentrant){
-                outn ("#ifdef VMS");
-                outn ("#ifdef __VMS_POSIX");
-                outn ("#define YY_STDINIT");
-                outn ("#endif");
-                outn ("#else");
-                outn ("#define YY_STDINIT");
-                outn ("#endif");
+	    if (do_stdinit) {
+                out_m4_define( "M4_DO_STDINIT", NULL );
             }
-
-			outn ("#ifdef VMS");
-			outn ("#ifndef __VMS_POSIX");
-			outn (yy_nostdinit);
-			outn ("#else");
-			outn (yy_stdinit);
-			outn ("#endif");
-			outn ("#else");
-			outn (yy_stdinit);
-			outn ("#endif");
-            */
-		}
-/*
-		else {
-			if(!reentrant)
-                outn (yy_nostdinit);
-		}
-		OUT_END_CODE ();
-*/
 	}
     
-
-	/* OUT_BEGIN_CODE (); */
 	if (fullspd)
         out_m4_define( "M4_YY_FULlSPD", NULL );
-	/*
-        outn ("typedef const struct yy_trans_info *yy_state_type;");
-	else if (!C_plus_plus)
-		outn ("typedef int yy_state_type;");
-	OUT_END_CODE ();
-    */
 
 	if (lex_compat)
-		/* outn ("#define YY_FLEX_LEX_COMPAT"); */
         out_m4_define( "M4_LEX_COMPAT", NULL );
 
-    /*
-	if (!C_plus_plus && !reentrant) {
-		outn ("extern int yylineno;");
-		OUT_BEGIN_CODE ();
-		outn ("int yylineno = 1;");
-		OUT_END_CODE ();
-	}
-    */
-
-    /*
-	if (C_plus_plus) {
-        /*
-		outn ("\n#include <FlexLexer.h>");
-
- 		if (!do_yywrap) {
-			outn("\nint yyFlexLexer::yywrap() { return 1; }");
-		}
-        
-        if (yyclass) {
-            outn ("int yyFlexLexer::yylex()");
-			outn ("\t{");
-			outn ("\tLexerError( \"yyFlexLexer::yylex invoked but %option yyclass used\" );");
-			outn ("\treturn 0;");
-			outn ("\t}");
-
-			out_str ("\n#define YY_DECL int %s::yylex()\n",
-				 yyclass);
-		}
-	}
-    
-	else {
-    */
     if (!C_plus_plus) {
-		/* Watch out: yytext_ptr is a variable when yytext is an array,
-		 * but it's a macro when yytext is a pointer.
-		 */
-/*
-        if (yytext_is_array) {
-			if (!reentrant)
-				outn ("extern char yytext[];\n");
-		}
-		else {
-			if (reentrant) {
-				outn ("#define yytext_ptr yytext_r");
-			}
-			else {
-				outn ("extern char *yytext;");
-
-				outn("#ifdef yytext_ptr");
-				outn("#undef yytext_ptr");
-				outn("#endif");
-				outn ("#define yytext_ptr yytext");
-			}
-		}
-*/
-		if (yyclass)
-			flexerror (_
-				   ("%option yyclass only meaningful for C++ scanners"));
-	}
+	/* Watch out: yytext_ptr is a variable when yytext is an array,
+	 * but it's a macro when yytext is a pointer.
+	 */
+	if (yyclass)
+	    flexerror (_("%option yyclass only meaningful for C++ scanners"));
+    }
 
 	if (useecs)
 		numecs = cre8ecs (nextecm, ecgroup, csize);

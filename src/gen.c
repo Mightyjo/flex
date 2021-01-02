@@ -940,13 +940,8 @@ void gen_NUL_trans (void)
 	 */
 	int     need_backing_up = (num_backing_up > 0 && !reject);
 
-	if (need_backing_up && (!nultrans || fullspd || fulltbl))
-		/* We're going to need yy_cp lying around for the call
-		 * below to gen_backing_up().
-		 */
-		indent_puts ("char *yy_cp = YY_G(yy_c_buf_p);");
-
-	outc ('\n');
+	/* Definition of yy_cp moved to skeleton. */
+        /* Some linters didn't notice it was needed by every branch. */
 
 	if (nultrans) {
 		indent_puts
@@ -1893,7 +1888,7 @@ void make_tables (void)
 
 	line_directive_out (stdout, 0);
 
-	skelout ();		/* %% [5.0] - break point in skel */
+/*	skelout ();		/* %% [5.0] - break point in skel */
 
 /*	if (!C_plus_plus) {
 		if (use_read) {
@@ -1971,7 +1966,7 @@ void make_tables (void)
 
 	line_directive_out (stdout, 0);
 
-	skelout ();		/* %% [8.0] - break point in skel */
+/*	skelout ();		/* %% [8.0] - break point in skel */
 
 /*	set_indent (2);
 
@@ -1987,7 +1982,7 @@ void make_tables (void)
 		--indent_level;
 	}
 */
-/*	skelout ();		/* %% [9.0] - break point in skel */
+	skelout ();		/* %% [9.0] - break point in skel */
 
 /*	gen_start_state ();
 *
