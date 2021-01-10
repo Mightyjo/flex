@@ -1462,9 +1462,9 @@ m4_ifdef( [[M4_YY_USE_READ]], [[ \
 		int c = '*'; \
 		int n; \
 		for ( n = 0; n < max_size && \
-			(c = getc( yyin )) != EOF && c != '\\n'; ++n ) \
+			(c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
-			if ( c == '\\n' ) \
+			if ( c == '\n' ) \
                 buf[n++] = (char) c; \
 			if ( c == EOF && ferror( yyin ) ) \
                 YY_FATAL_ERROR( "input in flex scanner failed" ); \
@@ -1627,7 +1627,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_RULE_SETUP \
 m4_ifdef( [[M4_YY_BOL_NEEDED]], [[ \
 	if ( yyleng > 0 ) \
-        YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (yytext[yyleng - 1] == '\\n'); \
+        YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (yytext[yyleng - 1] == '\n'); \
 ]], [[]] ) \
 	YY_USER_ACTION
 ]])
@@ -1778,7 +1778,6 @@ m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], [[
 		 */
 		yy_bp = yy_cp;
 
-%% [9.0] code to set up and find next match goes here
 m4_ifdef( [[M4_YY_FULLSPD]], [[
 m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
 		yy_current_state = yy_start_state_list[YY_G(yy_start) + YY_AT_BOL()];
@@ -1800,6 +1799,7 @@ m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
 ]] )
 
 yy_match:
+%% [9.0] code to set up and find next match goes here
 %# TODO: gen.c:1989 Translate gen_next_match here.
 
 yy_find_action:
