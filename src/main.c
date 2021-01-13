@@ -1636,7 +1636,13 @@ void readin (void)
 	}
     
 	if (fullspd)
-        out_m4_define( "M4_YY_FULlSPD", NULL );
+        out_m4_define( "M4_YY_FULLSPD", NULL );
+      
+        if (fulltbl)
+        out_m4_define( "M4_YY_FULLTBL", NULL );
+      
+        if (gentables)
+        out_m4_define( "M4_YY_GENTABLES", NULL );
 
 	if (lex_compat)
         out_m4_define( "M4_LEX_COMPAT", NULL );
@@ -1649,8 +1655,10 @@ void readin (void)
 	    flexerror (_("%option yyclass only meaningful for C++ scanners"));
     }
 
-	if (useecs)
+	if (useecs) {
 		numecs = cre8ecs (nextecm, ecgroup, csize);
+                out_m4_define( "M4_YY_USE_ECS", NULL );
+        }
 	else
 		numecs = csize;
 

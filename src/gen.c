@@ -1808,7 +1808,7 @@ void make_tables (void)
 */
 
     if(variable_trailing_context_rules) {
-        out_m4_define("M4_YY_VARIABLE_TRAILING_CONTEXT_RULES", "");
+        out_m4_define("M4_YY_VARIABLE_TRAILING_CONTEXT_RULES", NULL);
     }
     out_m4_define_hex ("M4_YY_TRAILING_MASK", (unsigned int) YY_TRAILING_MASK);
     out_m4_define_hex ("M4_YY_TRAILING_HEAD_MASK", (unsigned int) YY_TRAILING_HEAD_MASK);
@@ -1982,18 +1982,38 @@ void make_tables (void)
 		--indent_level;
 	}
 */
-	skelout ();		/* %% [9.0] - break point in skel */
+/*	skelout ();		/* %% [9.0] - break point in skel */
 
 /*	gen_start_state ();
 *
 	/* Note, don't use any indentation. */
 /*	outn ("yy_match:");
-*/	gen_next_match ();
+*/	
+        if (interactive)
+        out_m4_define( "M4_YY_INTERACTIVE", NULL );
+        
+        if (!fullspd && !fulltbl) {
+          out_m4_define_dec( "M4_YY_JAMBASE", jambase );
+          out_m4_define_dec( "M4_YY_JAMSTATE", jamstate );
+        }
+        
+        if (nultrans) {
+          out_m4_define( "M4_YY_NULTRANS", NULL );
+          out_m4_define_dec( "M4_YY_NUL_EC", NUL_ec );
+        }
+        
+        if (usemecs) {
+          out_m4_define( "M4_YY_USE_MECS", NULL );
+          out_m4_define_dec( "M4_YY_LASTDFA", lastdfa );
+        }
 
-	skelout ();		/* %% [10.0] - break point in skel */
-	set_indent (2);
+/*
+        gen_next_match ();
+*/
+/*	skelout ();		/* %% [10.0] - break point in skel */
+/*	set_indent (2);
 	gen_find_action ();
-
+*/
 	skelout ();		/* %% [11.0] - break point in skel */
 	outn ("m4_ifdef( [[M4_YY_USE_LINENO]],[[");
 	indent_puts
