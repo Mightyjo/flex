@@ -168,6 +168,9 @@ int flex_main (int argc, char *argv[])
 	flexinit (argc, argv);
 
 	readin ();
+        
+        skelout ();
+	/* %% [1.0] */
 
 	skelout ();
 	/* %% [1.5] DFA */
@@ -509,8 +512,7 @@ void check_options (void)
     /* Don't emit a bogus line directive since we aren't emitting code anymore. */
     /* outn("#line 0 \"M4_YY_OUTFILE_NAME\"\n"); */
 
-	skelout ();
-	/* %% [1.0] */
+
 }
 
 /* flexend - terminate flex
@@ -1258,7 +1260,7 @@ void flexinit (int argc, char **argv)
 
 		case OPT_ARRAY:
 			yytext_is_array = true;
-            buf_m4_define( &m4defs_buf, "M4_YYTEXT_IS_ARRAY", 0);
+            buf_m4_define( &m4defs_buf, "M4_YY_TEXT_IS_ARRAY", 0);
 			break;
 
 		case OPT_POINTER:
@@ -1544,8 +1546,8 @@ void readin (void)
 
 	if (yymore_really_used == true) {
 		yymore_used = true;
-        out_m4_define( "M4_YY_MORE_USED", NULL);
-    }
+		out_m4_define( "M4_YY_MORE_USED", NULL);
+	}
 	else if (yymore_really_used == false)
 		yymore_used = false;
 
@@ -1612,9 +1614,9 @@ void readin (void)
 	}
 
 	if (reject){
-        out_m4_define( "M4_YY_USES_REJECT", NULL);
+        out_m4_define( "M4_YY_USES_REJECT", NULL );
 		//outn ("\n#define YY_USES_REJECT");
-    }
+	}
 
 	if (!do_yywrap) {
         out_m4_define( "M4_YY_SKIP_YYWRAP", NULL );
@@ -1650,13 +1652,13 @@ void readin (void)
 	if (do_yylineno)
 	out_m4_define( "M4_YY_LINENO", NULL );
 
-    if (!C_plus_plus) {
-	/* Watch out: yytext_ptr is a variable when yytext is an array,
-	 * but it's a macro when yytext is a pointer.
-	 */
-	if (yyclass)
-	    flexerror (_("%option yyclass only meaningful for C++ scanners"));
-    }
+	if (!C_plus_plus) {
+		/* Watch out: yytext_ptr is a variable when yytext is an array,
+		 * but it's a macro when yytext is a pointer.
+		 */
+		if (yyclass)
+		    flexerror (_("%option yyclass only meaningful for C++ scanners"));
+	}
 
 	if (useecs) {
 		numecs = cre8ecs (nextecm, ecgroup, csize);

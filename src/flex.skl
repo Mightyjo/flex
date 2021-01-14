@@ -147,7 +147,7 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN
 %# m4_undef( [[M4_YY_FULLSPD]] )
 %# m4_undef( [[M4_LEX_COMPAT]] )
 %# m4_undef( [[M4_YYCLASS]] )
-%# m4_undef( [[M4_YYTEXT_IS_ARRAY]] )
+%# m4_undef( [[M4_YY_TEXT_IS_ARRAY]] )
 %# m4_undef( [[M4_YY_MAIN]] )
 %# m4_undef( [[M4_YY_NO_UNISTD_H]] )
 %# m4_undef( [[M4_YY_ALWAYS_INTERACTIVE]] )
@@ -199,6 +199,8 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN
 %#   Begin actual emission of code
 %#
 
+%% [1.0] Pause to allow Flex to set options from the command line, etc.
+
 %#   Emit the user-defined top block from the input.
 m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK )
 
@@ -210,8 +212,10 @@ m4_ifdef( [[M4_YY_USERDEF]], M4_YY_USERDEF )
 %if-c-only
 m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
   m4_ifdef( [[M4_YY_REENTRANT]], [[
-    #define [[M4_YY_PREFIX]]wrap(yyscanner) (/*CONSTCOND*/1)]], [[
-    #define [[M4_YY_PREFIX]]wrap() (/*CONSTCOND*/1)]] )
+    #define M4_YY_PREFIX[[wrap(yyscanner)]] (/*CONSTCOND*/1)
+  ]], [[
+    #define M4_YY_PREFIX[[wrap()]] (/*CONSTCOND*/1)
+  ]] )
 ]] )
 %endif
 
@@ -436,8 +440,10 @@ m4preproc_include(`flexint_shared.h')
 %#   Define the flex_uint8_t type
 m4_ifdef( [[M4_YY_IN_HEADER]], , [[typedef flex_uint8_t YY_CHAR;]] )
 
+%if-c++-only
 %#   Define the yytext_ptr macro, if needed
-m4_ifdef( [[M4_YYTEXT_PTR]], [[#define yytxp_ptr yytext]] )
+m4_ifdef( [[M4_YYTEXT_PTR]], [[#define yytext_ptr yytext]] )
+%endif
 
 %#   Declare the standard yyin and yyout files
 m4_ifdef( [[M4_YY_IN_HEADER]], [[M4_YY_STDFILES]], [[
@@ -494,21 +500,28 @@ int yyFlexLexer::yylex()
 ]] )
 %endif
 
-%#   Define yytxp_ptr in C 
+%#   Define yytext_ptr in C 
 %if-c-only
-m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], 
-          [[m4_ifndef( [[M4_YY_REENTRANT]], [[extern char yytext[];]] ) ]],
-		  [[m4_ifdef( [[M4_YY_REENTRANT]], 
-                      [[#define yytext_ptr yytext_r]], 
-                      [[
-                      extern char *yytext;
-                      
-                      #ifdef yytext_ptr
-                        #undef yytext_ptr
-                      #endif
-                      #define yytext_ptr yytext
-                      ]] )
-          ]] )
+m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[
+  m4_ifdef( [[M4_YY_REENTRANT]], [[
+#ifdef yytext_ptr
+#undef yytext_ptr
+#endif
+  ]], [[
+extern char yytext[];
+  ]] ) 
+]], [[
+  m4_ifdef( [[M4_YY_REENTRANT]], [[
+#define yytext_ptr yytext_r
+  ]], [[
+extern char *yytext;
+
+#ifdef yytext_ptr
+#undef yytext_ptr
+#endif
+#define yytext_ptr yytext
+  ]] )
+]] )
 %endif
 
 #if defined(__GNUC__) && __GNUC__ >= 3
@@ -898,7 +911,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 ]])
 
-%% [1.0] yytext/yyin/yyout/yy_state_type/yylineno etc. def's & init go here
+%# %% [1.0] yytext/yyin/yyout/yy_state_type/yylineno etc. def's & init go here
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
@@ -925,32 +938,35 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_DO_BEFORE_ACTION \
 	YY_G(yytext_ptr) = yy_bp; \
 %# %% [2.0] code to fiddle yytext and yyleng for yymore() goes here \
-m4_ifdef( [[M4_YY_USED]], [[ \
-  m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], [[ \
-    yyleng = (int) (yy_cp - yy_bp); \
+m4_ifdef( [[M4_YY_MORE_USED]], [[ \
+  m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[ \
+	yyleng = (int) (yy_cp - yy_bp); \
   ]], [[ \
-    YY_G(yytext_ptr) -= YY_G(yy_more_len); \
-    yyleng = (int) (yy_cp - YY_G(yytext_ptr)); \
-  ]] ) ]], [[ \
-    yyleng = (int) (yy_cp - yy_bp); \
+	YY_G(yytext_ptr) -= YY_G(yy_more_len); \
+	yyleng = (int) (yy_cp - YY_G(yytext_ptr)); \
   ]] ) \
+]], [[ \
+	yyleng = (int) (yy_cp - yy_bp); \
+]] ) \
 	YY_G(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 %# %% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \
-m4_ifdef( [[M4_YYTEXT_IS_ARRAY]],
-    m4_ifdef( [[M4_YY_MORE_USED]],
-	[[if ( yyleng + YY_G(yy_more_offset) >= YYLMAX ) \]],
-    [[if ( yyleng >= YYLMAX ) \]]
-    )
-    [[YY_FATAL_ERROR( \"token too large, exceeds YYLMAX\" ); \]]
-    m4_ifdef( [[M4_YY_MORE_USED]],
-	[[yy_flex_strncpy( &yytext[YY_G(yy_more_offset)], YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \
+m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[ \
+    m4_ifdef( [[M4_YY_MORE_USED]], [[ \
+	if ( yyleng + YY_G(yy_more_offset) >= YYLMAX ) \
+    ]], [[ \
+	if ( yyleng >= YYLMAX ) \
+    ]] ) \
+	YY_FATAL_ERROR( \"token too large, exceeds YYLMAX\" ); \
+    m4_ifdef( [[M4_YY_MORE_USED]], [[ \
+	yy_flex_strncpy( &yytext[YY_G(yy_more_offset)], YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \
 	yyleng += YY_G(yy_more_offset); \
 	YY_G(yy_prev_more_offset) = YY_G(yy_more_offset); \
-	YY_G(yy_more_offset) = 0; \]],
-    [[yy_flex_strncpy( yytext, YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \]]
-    )
-) \
+	YY_G(yy_more_offset) = 0; \
+    ]], [[ \
+	yy_flex_strncpy( yytext, YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \
+    ]] ) \
+]] ) \
     YY_G(yy_c_buf_p) = yy_cp;
 
 %# %% [4.0] data tables for the DFA and the user's section 1 definitions go here
@@ -1335,13 +1351,13 @@ m4_ifdef( [[<M4_YY_BISON_LLOC>]],
  * section 1.
  */
 
-#ifndef YY_SKIP_YYWRAP
+m4_ifdef( [[M4_YY_SKIP_YYWRAP]], , [[
 #ifdef __cplusplus
 extern "C" int yywrap ( M4_YY_PROTO_ONLY_ARG );
 #else
 extern int yywrap ( M4_YY_PROTO_ONLY_ARG );
 #endif
-#endif
+]] )
 
 %not-for-header
 #ifndef YY_NO_UNPUT
@@ -1744,7 +1760,7 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 	{
 %# %% [8.0] yymore()-related code goes here
 m4_ifdef( [[M4_YY_MORE_USED]], [[ 
-  m4_ifdef( [[M4_YYTEXT_IS_ARRAY]], , [[
+  m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], , [[
 		YY_G(yy_more_len) = 0;
 		if ( YY_G(yy_more_flag) )
 		{
@@ -2208,7 +2224,7 @@ if (fullspd || fulltbl)
 			{
 				YY_G(yy_did_buffer_switch_on_eof) = 0;
 
-				if ( yywrap( M4_YY_CALL_ONLY_ARG ) )
+				if ( yywrap(M4_YY_CALL_ONLY_ARG) )
 				{
 					/* Note: because we've taken care in
 					 * yy_get_next_buffer() to have set up
