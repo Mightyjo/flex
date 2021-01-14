@@ -1999,7 +1999,6 @@ void make_tables (void)
         
         if (nultrans) {
           out_m4_define( "M4_YY_NULTRANS", NULL );
-          out_m4_define_dec( "M4_YY_NUL_EC", NUL_ec );
         }
         
         if (usemecs) {
@@ -2014,8 +2013,9 @@ void make_tables (void)
 /*	set_indent (2);
 	gen_find_action ();
 */
-	skelout ();		/* %% [11.0] - break point in skel */
-	outn ("m4_ifdef( [[M4_YY_USE_LINENO]],[[");
+        
+/*	skelout ();		/* %% [11.0] - break point in skel */
+/*	outn ("m4_ifdef( [[M4_YY_USE_LINENO]],[[");
 	indent_puts
 		("if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )");
 	++indent_level;
@@ -2034,9 +2034,10 @@ void make_tables (void)
 	indent_puts ("}");
 	--indent_level;
 	outn ("]])");
-
-	skelout ();		/* %% [12.0] - break point in skel */
-	if (ddebug) {
+*/
+        
+/*	skelout ();		/* %% [12.0] - break point in skel */
+/*	if (ddebug) {
 		indent_puts ("if ( yy_flex_debug )");
 		++indent_level;
 
@@ -2112,11 +2113,14 @@ void make_tables (void)
 		indent_puts ("}");
 		--indent_level;
 	}
+*/
 
 	/* Copy actions to output file. */
 	skelout ();		/* %% [13.0] - break point in skel */
 	++indent_level;
-	gen_bu_action ();
+/*
+ *    gen_bu_action ();
+  */
 	out (&action_array[action_offset]);
 
 	line_directive_out (stdout, 0);
@@ -2141,18 +2145,18 @@ void make_tables (void)
 	/* First, deal with backing up and setting up yy_cp if the scanner
 	 * finds that it should JAM on the NUL.
 	 */
-	skelout ();		/* %% [14.0] - break point in skel */
-	set_indent (4);
+/*	skelout ();		/* %% [14.0] - break point in skel */
+/*	set_indent (4);
 
 	if (fullspd || fulltbl)
 		indent_puts ("yy_cp = YY_G(yy_c_buf_p);");
 
 	else {			/* compressed table */
-		if (!reject && !interactive) {
+/*		if (!reject && !interactive) {
 			/* Do the guaranteed-needed backing up to figure
 			 * out the match.
 			 */
-			indent_puts
+/*			indent_puts
 				("yy_cp = YY_G(yy_last_accepting_cpos);");
 			indent_puts
 				("yy_current_state = YY_G(yy_last_accepting_state);");
@@ -2163,28 +2167,29 @@ void make_tables (void)
 			 * yy_current_state was set up by
 			 * yy_get_previous_state().
 			 */
-			indent_puts ("yy_cp = YY_G(yy_c_buf_p);");
+/*			indent_puts ("yy_cp = YY_G(yy_c_buf_p);");
 	}
-
+*/
 
 	/* Generate code for yy_get_previous_state(). */
-	set_indent (1);
+/*	set_indent (1);
 	skelout ();		/* %% [15.0] - break point in skel */
-
-	gen_start_state ();
-
+/*
+ *	gen_start_state ();
+ */
+/*
 	set_indent (2);
 	skelout ();		/* %% [16.0] - break point in skel */
-	gen_next_state (true);
-
-	set_indent (1);
+/*	gen_next_state (true);
+*/
+/*	set_indent (1);
 	skelout ();		/* %% [17.0] - break point in skel */
-	gen_NUL_trans ();
-
-	skelout ();		/* %% [18.0] - break point in skel */
-	skelout ();		/* %% [19.0] - break point in skel */
+/*	gen_NUL_trans ();
+ */
+/*	skelout ();		/* %% [18.0] - break point in skel */
+/*	skelout ();		/* %% [19.0] - break point in skel */
 	/* Update BOL and yylineno inside of input(). */
-	if (bol_needed) {
+/*	if (bol_needed) {
 		indent_puts
 			("YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\\n');");
 		if (do_yylineno) {
@@ -2202,7 +2207,7 @@ void make_tables (void)
 		indent_puts ("M4_YY_INCR_LINENO();");
 		--indent_level;
 	}
-
+*/
 	skelout ();
 
 	/* Copy remainder of input to output. */

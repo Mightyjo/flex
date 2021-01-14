@@ -1646,6 +1646,9 @@ void readin (void)
 
 	if (lex_compat)
         out_m4_define( "M4_LEX_COMPAT", NULL );
+      
+	if (do_yylineno)
+	out_m4_define( "M4_YY_LINENO", NULL );
 
     if (!C_plus_plus) {
 	/* Watch out: yytext_ptr is a variable when yytext is an array,
@@ -1665,6 +1668,7 @@ void readin (void)
 	/* Now map the equivalence class for NUL to its expected place. */
 	ecgroup[0] = ecgroup[csize];
 	NUL_ec = ABS (ecgroup[0]);
+        out_m4_define_dec( "M4_YY_NUL_EC", NUL_ec );
 
 	if (useecs)
 		ccl2ecl ();
