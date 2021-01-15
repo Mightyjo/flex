@@ -79,20 +79,20 @@ m4_ifdef([[M4_YY_LONG_ALIGNED]], [[
 %#   Defines a table with a parameterized name and dimension.
 %#      /param1 - name of the table
 %#      /param2 - number of rows
-m4_define( [[DEFINE_TABLE_2D]], [[static yyconst YY_INT_ALIGNED $1 [][$2] =
+m4_define( [[DEFINE_TABLE_2D]], [[static const YY_INT_ALIGNED $1 [][$2] =
 {
 ]] )
 
 %#   Defines an array with a parameterized name and dimension.
 %#      /param1 - name of the table
 %#      /param2 - number of cells
-m4_define( [[DEFINE_ARRAY]], [[static yyconst YY_INT_ALIGNED $1 [$2] =
+m4_define( [[DEFINE_ARRAY]], [[static const YY_INT_ALIGNED $1 [$2] =
 {
 ]] )
 
 %#   Like DEFINE_TABLE, but for strictly empty tables
 %#      /param1 - name of the table
-m4_define( [[DEFINE_TABLE_EMPTY]], [[static yyconst YY_INT_ALIGNED * $1 = 0;
+m4_define( [[DEFINE_TABLE_EMPTY]], [[static const YY_INT_ALIGNED * $1 = 0;
 ]] )
 
 %#   Defines the end-of-table syntax
@@ -437,6 +437,12 @@ m4preproc_include(`flexint.h')
 m4preproc_include(`flexint_shared.h')
 %endif
 
+%if-c-or-c++
+#ifndef yyconst
+#define yyconst const
+#endif
+%endif
+
 %#   Define the flex_uint8_t type
 m4_ifdef( [[M4_YY_IN_HEADER]], , [[typedef flex_uint8_t YY_CHAR;]] )
 
@@ -463,7 +469,7 @@ m4_ifdef( [[M4_YY_IN_HEADER]], [[M4_YY_STDFILES]], [[
 %#  Define what to emit for the -F CLI swtich
 m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
   m4_ifdef( [[M4_YY_FULLSPD]], 
-            [[typedef yyconst struct yy_trans_info *yy_state_type;]] )
+            [[typedef const struct yy_trans_info *yy_state_type;]] )
 ]] )
 %if-c-only
 m4_ifdef( [[M4_YY_IN_HEADER]], ,  [[
@@ -682,7 +688,9 @@ extern int yyleng;
 
 %if-c-only
 %if-not-reentrant
+m4_ifdef( [[M4_YY_NOT_IN_HEADER]], [[
 M4_YY_NO_STDINIT
+]] )
 %endif
 %endif
 
