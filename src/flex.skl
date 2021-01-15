@@ -932,6 +932,19 @@ static void yynoreturn yy_fatal_error ( const char* msg M4_YY_PROTO_LAST_ARG );
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
+/* Report a fatal error. */
+#ifndef YY_FATAL_ERROR
+%if-c-only
+#define YY_FATAL_ERROR(msg) yy_fatal_error( msg M4_YY_CALL_LAST_ARG)
+%endif
+%if-c++-only
+#define YY_FATAL_ERROR(msg) LexerError( msg )
+%endif
+#endif
+]])
+
+m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
+[[
 /* Done after the current pattern has been matched and before the
  * corresponding action - sets up yytext.
  */
@@ -957,7 +970,7 @@ m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[ \
     ]], [[ \
 	if ( yyleng >= YYLMAX ) \
     ]] ) \
-	YY_FATAL_ERROR( \"token too large, exceeds YYLMAX\" ); \
+	YY_FATAL_ERROR( "token too large, exceeds YYLMAX" ); \
     m4_ifdef( [[M4_YY_MORE_USED]], [[ \
 	yy_flex_strncpy( &yytext[YY_G(yy_more_offset)], YY_G(yytext_ptr), yyleng + 1 M4_YY_CALL_LAST_ARG); \
 	yyleng += YY_G(yy_more_offset); \
@@ -1509,8 +1522,8 @@ m4_ifdef( [[M4_YY_USE_READ]], [[ \
 \
 %if-c++-only C++ definition \
 	if ( (int)(result = LexerInput( (char *) buf, max_size )) < 0 ) \
-		YY_FATAL_ERROR( "input in flex scanner failed" );
-%endif
+		YY_FATAL_ERROR( "input in flex scanner failed" ); \
+%endif \
 
 #endif
 ]])
@@ -1531,18 +1544,7 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 #define YY_START_STACK_INCR 25
 #endif
 
-m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
-[[
-/* Report a fatal error. */
-#ifndef YY_FATAL_ERROR
-%if-c-only
-#define YY_FATAL_ERROR(msg) yy_fatal_error( msg M4_YY_CALL_LAST_ARG)
-%endif
-%if-c++-only
-#define YY_FATAL_ERROR(msg) LexerError( msg )
-%endif
-#endif
-]])
+
 
 %if-tables-serialization structures and prototypes
 m4preproc_include(`tables_shared.h')
