@@ -104,7 +104,7 @@ struct Buf *buf_printns (struct Buf *buf, const char *fmt, const int count, ...)
 	    flexfatal (_("Allocation of buffer to print string failed"));
 	
 	va_start(ap, count);
-	snprintf (t, tsz, fmt, ap);
+	vsnprintf (t, tsz, fmt, ap);
 	va_end(ap);
 	buf = buf_strappend (buf, t);
 	free(t);
