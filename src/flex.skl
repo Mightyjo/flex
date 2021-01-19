@@ -921,6 +921,19 @@ m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 
 %# %% [1.0] yytext/yyin/yyout/yy_state_type/yylineno etc. def's & init go here
 
+m4_ifdef(  [[M4_YY_FULLSPD]], , [[
+/* This struct is not used in this scanner */
+/* but its presence is necessary. */]]
+)
+#ifndef YY_STRUCT_YY_TRANS_INFO
+#define YY_STRUCT_YY_TRANS_INFO
+struct yy_trans_info
+{
+    flex_int[[]]M4_YY_TRANS_OFFSET_TYPE[[]]_t yy_verify;
+    flex_int[[]]M4_YY_TRANS_OFFSET_TYPE[[]]_t yy_nxt;
+};
+#endif /* YY_STRUCT_YY_TRANS_INFO */
+
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
 %% [1.5] DFA
@@ -994,15 +1007,7 @@ m4_ifdef( [[M4_YY_TEXT_IS_ARRAY]], [[ \
 #define YY_NUM_RULES M4_YY_NUM_RULES
 #define YY_END_OF_BUFFER M4_YY_END_OF_BUFFER
 
-m4_ifdef(  [[M4_YY_FULLSPD]], , [[
-/* This struct is not used in this scanner */
-/* but its presence is necessary. */]]
-)
-struct yy_trans_info
-{
-    flex_int[[]]M4_YY_TRANS_OFFSET_TYPE[[]]_t yy_verify;
-    flex_int[[]]M4_YY_TRANS_OFFSET_TYPE[[]]_t yy_nxt;
-};
+
 
 %# TODO: The tables have to be output here, but the code to do it is a mess of spaghetti.
 %#       It looks like it'll work best to create commands like %tables-yydmap that dump
@@ -2193,7 +2198,6 @@ m4_ifdef( [[M4_YY_USES_REJECT]], , [[
 			{
 %# %% [14.0] code to do back-up for compressed tables and set up yy_cp goes here
 m4_ifdef( [[M4_YY_FULLSPD]], [[
-if (fullspd || fulltbl)
 				yy_cp = YY_G(yy_c_buf_p);
 ]], [[
   m4_ifdef( [[M4_YY_FULLTBL]], [[
