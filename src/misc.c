@@ -427,7 +427,7 @@ void mk2data (int value)
 		out ("INDENT ");
 
 	else
-		out ("COLUMN_SEPARATOR" );
+		out ("COLUMN_SEPARATOR ");
 
 	++datapos;
 

@@ -529,7 +529,7 @@ void ntod (void)
 				 long_align ? "flex_int32_t" : "flex_int16_t",
 				 num_full_table_rows);
         */
-            out_str_dec("DEFINE_TABLE(%s, %d)", "yy_nxt", num_full_table_rows);
+            out_str_dec("DEFINE_TABLE_2D(%s, %d)", "yy_nxt", num_full_table_rows);
 		else {
 		/*	out_dec ("#undef YY_NXT_LOLEN\n#define YY_NXT_LOLEN (%d)\n", num_full_table_rows); */
             out_dec ("RESET_NXT_LOLEN(%d)", num_full_table_rows);
