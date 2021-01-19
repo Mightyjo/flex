@@ -1553,20 +1553,15 @@ void make_tables (void)
 /*
 	out_dec ("#define YY_NUM_RULES %d\n", num_rules);
 	out_dec ("#define YY_END_OF_BUFFER %d\n", num_rules + 1);
-*/
 
 	if (fullspd) {
 		/* Need to define the transet type as a size large
 		 * enough to hold the biggest offset.
 		 */
-		int     total_table_size = tblend + numecs + 1;
+/*		int     total_table_size = tblend + numecs + 1;
 		char   *trans_offset_type =
 			(total_table_size >= INT16_MAX || long_align) ?
-			/*"flex_int32_t" : "flex_int16_t";*/
-            "32" : "16";
-
-        out_m4_define("M4_YY_TRANS_OFFSET_TYPE", trans_offset_type);
-/*        
+			"flex_int32_t" : "flex_int16_t";
 		set_indent (0);
 		indent_puts ("struct yy_trans_info");
 		++indent_level;
@@ -1587,7 +1582,7 @@ void make_tables (void)
 		indent_put2s ("%s yy_nxt;", trans_offset_type);
 		indent_puts ("};");
 		--indent_level;
-*/
+
     }
 	else {
 		/* We generate a bogus 'struct yy_trans_info' data type
@@ -1595,7 +1590,6 @@ void make_tables (void)
 		 * This is so we can compile "sizeof(struct yy_trans_info)"
 		 * in any scanner.
 		 */
-        out_m4_define("M4_YY_TRANS_OFFSET_TYPE", "32");
 /*
         indent_puts
 			("\/* This struct is not used in this scanner,");
@@ -1607,9 +1601,9 @@ void make_tables (void)
 		indent_puts ("flex_int32_t yy_nxt;");
 		indent_puts ("};");
 		--indent_level;
-*/
-	}
 
+	}
+*/
 	if (fullspd) {
 		genctbl ();
 		if (tablesext) {

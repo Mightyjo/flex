@@ -1671,6 +1671,20 @@ void readin (void)
 	ecgroup[0] = ecgroup[csize];
 	NUL_ec = ABS (ecgroup[0]);
         out_m4_define_dec( "M4_YY_NUL_EC", NUL_ec );
+        
+        if (fullspd) {
+          /* Need to define the transet type as a size large
+           * enough to hold the biggest offset.
+           */
+          int     total_table_size = tblend + numecs + 1;
+          char   *trans_offset_type = 
+              (total_table_size >= INT16_MAX || long_align) ? "32" : "16";
+
+          out_m4_define("M4_YY_TRANS_OFFSET_TYPE", trans_offset_type);
+        }
+        else {
+          out_m4_define("M4_YY_TRANS_OFFSET_TYPE", "32");
+        }
 
 	if (useecs)
 		ccl2ecl ();
