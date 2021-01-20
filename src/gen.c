@@ -1547,9 +1547,7 @@ void make_tables (void)
 
     out_m4_define_dec("M4_YY_NUM_RULES", num_rules);
     out_m4_define_dec("M4_YY_END_OF_BUFFER", num_rules + 1);
-    if( num_backing_up > 0 ) {
-        out_m4_define("M4_YY_NEEDS_BACKING_UP", NULL);
-    }
+    
 /*
 	out_dec ("#define YY_NUM_RULES %d\n", num_rules);
 	out_dec ("#define YY_END_OF_BUFFER %d\n", num_rules + 1);
@@ -1687,6 +1685,9 @@ void make_tables (void)
 				("static char *yy_last_accepting_cpos;\n");
 		}
 	}
+        if( num_backing_up > 0 ) {
+          out_m4_define("M4_YY_NEEDS_BACKING_UP", NULL);
+        }
 
 	if (nultrans) {
 		flex_int32_t *yynultrans_data = 0;
