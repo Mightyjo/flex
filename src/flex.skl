@@ -221,9 +221,9 @@ m4_ifdef( [[M4_YY_SKIP_YYWRAP]], [[
 
 %#   Enable debugging, or not
 m4_ifdef( [[M4_FLEX_DEBUG]], [[#define FLEX_DEBUG (/*CONSTCOND*/1)]], [[
-  m4_define( [[M4_YY_NO_GET_DEBUG]], 1 )
-  m4_define( [[M4_YY_NO_SET_DEBUG]], 1 )
-]])
+  m4_define( [[M4_YY_NO_GET_DEBUG]], 0 )
+  m4_define( [[M4_YY_NO_SET_DEBUG]], 0 )
+]] )
 
 
 %#   Define handling for the --lex-compat flag
@@ -276,8 +276,8 @@ m4_ifdef( [[M4_YY_IN_HEADER]], , [[m4_define( [[M4_YY_NOT_IN_HEADER]], [[]] )]] 
 m4_ifdef( [[M4_YY_REENTRANT]], , [[m4_define( [[M4_YY_NOT_REENTRANT]], [[]] )]] )
 
 %# This is the m4 way to say "(stack_used || is_reentrant)
-m4_ifdef( [[M4_YY_STACK_USED]], [[m4_define( [[M4_YY_HAS_START_STACK_VARS]] )]] )
-m4_ifdef( [[M4_YY_REENTRANT]],  [[m4_define( [[M4_YY_HAS_START_STACK_VARS]] )]] )
+m4_ifdef( [[M4_YY_STACK_USED]], [[m4_define( [[M4_YY_HAS_START_STACK_VARS]], [[]] ) ]] )
+m4_ifdef( [[M4_YY_REENTRANT]],  [[m4_define( [[M4_YY_HAS_START_STACK_VARS]], [[]] ) ]] )
 
 %# Prefixes.
 %# The complexity here is necessary so that m4 preserves
