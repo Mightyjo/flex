@@ -1058,7 +1058,7 @@ m4_ifdef( [[M4_VARIABLE_TRAILING_CONTEXT_RULES]],
 m4_ifdef( [[M4_VARIABLE_TRAILING_CONTEXT_RULES]], [[ \
 			YY_G(yy_lp) = YY_G(yy_full_lp); /* restore orig. accepting pos. */ \
 			YY_G(yy_state_ptr) = YY_G(yy_full_state); /* restore orig. state */ \
-			yy_current_state = *YY_G(yy_state_ptr); /* restore curr. state */ \ 
+			yy_current_state = *YY_G(yy_state_ptr); /* restore curr. state */ \
 ]] ) \
 		++YY_G(yy_lp); \
 		goto find_rule; \
@@ -2106,7 +2106,7 @@ m4_ifdef( [[M4_FLEX_DEBUG]], [[
 m4_ifdef( [[M4_YY_USES_REJECT]], , [[
   m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
 	case 0: /* must back up */
-		/* undo the effects of YY_DO_BEFORE_ACTION *
+		/* undo the effects of YY_DO_BEFORE_ACTION */
 		*yy_cp = YY_G(yy_hold_char);
 
     m4_ifdef( [[M4_YY_FULLSPD]], [[
@@ -2125,7 +2125,9 @@ m4_ifdef( [[M4_YY_USES_REJECT]], , [[
 		goto yy_find_action;
   ]] )
 ]] )
+
 %% [13.0] actions go here
+
 	case YY_END_OF_BUFFER:
 	{
 		/* Amount of text matched not including the EOB char. */
@@ -2789,7 +2791,7 @@ m4_ifdef( [[M4_YY_NULTRANS]], [[
   ]] )
 ]] )
 
-m4_ifdef( [[M4_YY_NEED_BACKING_UP]], [[
+m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
   m4_ifdef( [[M4_YY_REJECT]], , [[
     m4_ifdef( [[M4_YY_FULLSPD]], [[
 	if ( ! yy_is_jam )
