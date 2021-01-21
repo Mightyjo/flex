@@ -175,7 +175,7 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN
 %# m4_undef( [[M4_YY_NO_SET_LVAL]] )
 %# m4_undef( [[M4_YY_NO_GET_LLOC]] )
 %# m4_undef( [[M4_YY_NO_SET_LLOC]] )
-%# m4_undef( [[M4_YY_VARIABLE_TRAILING_CONTEXT_RULES]] )
+%# m4_undef( [[M4_VARIABLE_TRAILING_CONTEXT_RULES]] )
 %# m4_undef( [[M4_YY_USE_READ]] )
 %# m4_undef( [[M4_YY_BOL_NEEDED]] )
 %# m4_undef( [[M4_YY_USE_ECS]] )
@@ -1040,7 +1040,7 @@ m4_ifdef( [[M4_YY_REENTRANT]], , [[
 ]] )
 %endif
 
-m4_ifdef( [[M4_YY_VARIABLE_TRAILING_CONTEXT_RULES]],
+m4_ifdef( [[M4_VARIABLE_TRAILING_CONTEXT_RULES]],
 [[
 %if-c-only
 			static int yy_looking_for_trail_begin = 0;
@@ -1947,9 +1947,7 @@ m4_ifdef( [[M4_YY_FULLSPD]], [[
 		yy_current_state = *--YY_G(yy_state_ptr);
 		YY_G(yy_lp) = yy_accept[yy_current_state];
 
-      m4_ifdef( [[M4_VARIABLE_TRAILING_CONTEXT_RULES]], , [[
 find_rule: /* we branch to this label when backing up */
-      ]] )
 
 		for ( ; ; ) /* until we find what rule we matched */
 		{                
@@ -1991,7 +1989,7 @@ find_rule: /* we branch to this label when backing up */
 					break;
 				}
                         
-				++YY_G(yy_lp)
+				++YY_G(yy_lp);
 				goto find_rule;
         ]], [[
 			/* Remember matched text in case we back up due to

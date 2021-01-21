@@ -1803,7 +1803,7 @@ void make_tables (void)
 */
 
     if(variable_trailing_context_rules) {
-        out_m4_define("M4_YY_VARIABLE_TRAILING_CONTEXT_RULES", NULL);
+        out_m4_define("M4_VARIABLE_TRAILING_CONTEXT_RULES", NULL);
     }
     out_m4_define_hex ("M4_YY_TRAILING_MASK", (unsigned int) YY_TRAILING_MASK);
     out_m4_define_hex ("M4_YY_TRAILING_HEAD_MASK", (unsigned int) YY_TRAILING_HEAD_MASK);
