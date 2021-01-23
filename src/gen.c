@@ -72,6 +72,13 @@ static const char *get_state_decl (void)
                : "DEFINE_STATE_TABLE_EMPTY( %s )";
 }
 
+static const char *get_typed_decl (void)
+{
+  return (gentables)
+         ? "DEFINE_TYPE_ARRAY( %s, %s, %d )"
+         : "DEFINE_TYPE_TABLE_EMPTY( %s, %s )";
+}
+
 static const char *get_yy_char_decl (void)
 {
 	return (gentables)
@@ -339,10 +346,10 @@ void genctbl (void)
 
 	/* Table of verify for transition and offset to next state. */
 	if (gentables)
-		out_str_dec ("DEFINE_TYPE_ARRAY( M4_YY_TRANS_INFO_TYPE, %s, %d )", "yy_transition", tblend + numecs + 1);
+		out_str2_dec (get_typed_decl(), "M4_YY_TRANS_INFO_TYPE", "yy_transition", tblend + numecs + 1);
               
 	else
-		out_str ("DEFINE_TYPE_TABLE_EMPTY( M4_YY_TRANS_INFO_P_TYPE, %s )", "yy_transition");
+		out_str2 (get_typed_decl(), "M4_YY_TRANS_INFO_P_TYPE", "yy_transition");
 
 	/* We want the transition to be represented as the offset to the
 	 * next state, not the actual state number, which is what it currently
@@ -413,9 +420,9 @@ void genctbl (void)
 
 	/* Table of pointers to start states. */
 	if (gentables)
-		out_str_dec ("DEFINE_TYPE_ARRAY( M4_YY_TRANS_INFO_P_TYPE, %s, %d )", "yy_start_state_list", lastsc * 2 + 1);
+		out_str2_dec (get_typed_decl(), "M4_YY_TRANS_INFO_P_TYPE", "yy_start_state_list", lastsc * 2 + 1);
 	else
-		out_str ("DEFINE_TYPE_TABLE_EMPTY( M4_YY_TRANS_INFO_PP_TYPE, %s, %d )", "yy_start_state_list");
+		out_str2 (get_typed_decl(), "M4_YY_TRANS_INFO_PP_TYPE", "yy_start_state_list");
 
 	if (gentables) {
 		
