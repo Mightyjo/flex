@@ -428,7 +428,7 @@ void genctbl (void)
 		
 
 		for (i = 0; i <= lastsc * 2; ++i)
-			out_dec ("    &yy_transition[%d],\n", base[i]);
+			out_dec ("REFERENCE_TABLE_ENTRY(yy_transition, %d)[[]]COLUMN_SEPARATOR[[]]TABLE_BLOCK[[]]", base[i]);
 
 		dataend ();
 	}
