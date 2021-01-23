@@ -846,15 +846,15 @@ void transition_struct_out (int element_v, int element_n)
 	if (!gentables)
 		return;
 
-	out_dec2 (" {%4d,%4d },", element_v, element_n);
+	out_dec2 ("BEGIN_STRUCT[[]]%4d[[]]NEXT_SLOT[[]]%4d[[]]LAST_SLOT[[]]NEXT_STRUCT[[]]", element_v, element_n);
 
 	datapos += TRANS_STRUCT_PRINT_LENGTH;
 
 	if (datapos >= 79 - TRANS_STRUCT_PRINT_LENGTH) {
-		outc ('\n');
+		outn ("[[]]TABLE_BLOCK[[]]");
 
 		if (++dataline % 10 == 0)
-			outc ('\n');
+			outn ("[[]]TABLE_BLOCK[[]]");
 
 		datapos = 0;
 	}

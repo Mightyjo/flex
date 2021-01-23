@@ -76,6 +76,11 @@ m4_ifdef([[M4_YY_LONG_ALIGNED]], [[
 #define YY_INT_ALIGNED flex_int16_t
 ]] )
 
+%#   Defines type macros emitted by flex.
+m4_define( [[M4_YY_TRANS_INFO_TYPE]], [[struct yy_trans_info]] )
+m4_define( [[M4_YY_TRANS_INFO_P_TYPE]], [[struct yy_trans_info*]] )
+m4_define( [[M4_YY_TRANS_INFO_PP_TYPE]], [[struct yy_trans_info**]] )
+
 %#   Defines a table with a parameterized name and dimension.
 %#      /param1 - name of the table
 %#      /param2 - number of rows
@@ -87,6 +92,20 @@ m4_define( [[DEFINE_TABLE_2D]], [[static const YY_INT_ALIGNED $1 [][$2] =
 %#      /param1 - name of the table
 %#      /param2 - number of cells
 m4_define( [[DEFINE_ARRAY]], [[static const YY_INT_ALIGNED $1 [$2] =
+{ 0,
+]] )
+m4_define( [[DEFINE_LONG_ARRAY]], [[static const flex_int32_t $1 [$2] =
+{ 0,
+]] )
+m4_define( [[DEFINE_STATE_ARRAY]], [[static const yy_state_type $1 [$2] =
+{ 0,
+]] )
+m4_define( [[DEFINE_CHAR_ARRAY]], [[static const YY_CHAR $1 [$2] =
+{ 0,
+]] )
+%# One-off typed arrays. Usually structs.
+%# Zero-indexed, unlike all the other arrays.
+m4_define( [[DEFINE_TYPE_ARRAY]], [[static const $1 $2 [$3] =
 {
 ]] )
 
@@ -94,6 +113,15 @@ m4_define( [[DEFINE_ARRAY]], [[static const YY_INT_ALIGNED $1 [$2] =
 %#      /param1 - name of the table
 m4_define( [[DEFINE_TABLE_EMPTY]], [[static const YY_INT_ALIGNED * $1 = 0;
 ]] )
+m4_define( [[DEFINE_LONG_TABLE_EMPTY]], [[static const flex_int32_t * $1 = 0;
+]] )
+m4_define( [[DEFINE_STATE_TABLE_EMPTY]], [[static const yy_state_type * $1 = 0;
+]] )
+m4_define( [[DEFINE_CHAR_TABLE_EMPTY]], [[static const YY_CHAR * $1 = 0;
+]] )
+m4_define( [[DEFINE_TYPE_TABLE_EMPTY]], [[static const $1 $2 = 0;
+]] )
+
 
 %#   Defines the end-of-table syntax
 m4_define( [[END_TABLE]], [[}]] )
@@ -104,6 +132,13 @@ m4_define( [[END_ROW]], [[},
 ]] )
 m4_define( [[LAST_ROW]], [[} ;
 ]] )
+
+%# Define structure & slot syntax
+m4_define( [[BEGIN_STRUCT]], [[{]] )
+m4_define( [[NEXT_STRUCT]], [[},]] )
+m4_define( [[LAST_STRUCT]], [[}]] )
+m4_define( [[NEXT_SLOT]], [[,]] )
+m4_define( [[LAST_SLOT]], [[]] )
 
 %#   Defines the column separator syntax
 m4_define( [[COLUMN_SEPARATOR]], [[,]] )
