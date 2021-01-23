@@ -1634,10 +1634,10 @@ void make_tables (void)
     out_m4_define_hex ("M4_YY_TRAILING_HEAD_MASK", (unsigned int) YY_TRAILING_HEAD_MASK);
 
     
-    /* The need to output the user's actions here means we still need a skelout for now.
-     * This may be remediated by adding a % command to the skeleton down the line. 
-     */
-    skelout ();		/* %% [TK] - break point in skel */
+	/* The need to output the user's actions here means we still need a skelout for now.
+	 * This may be remediated by adding a % command to the skeleton down the line. 
+	 */
+	skelout ();		/* %% [3.0] - break point in skel */
     
 	out (&action_array[defs1_offset]);
 
@@ -1654,7 +1654,7 @@ void make_tables (void)
     }
     
     /* This one might be needed because of the action_array output */
-	skelout ();		/* %% [7.0] - break point in skel */
+	skelout ();		/* %% [4.0] - break point in skel */
 
 	/* Copy prolog to output file. */
 	out (&action_array[prolog_offset]);
@@ -1682,7 +1682,7 @@ void make_tables (void)
 
 
 	/* Copy actions to output file. */
-	skelout ();		/* %% [13.0] - break point in skel */
+	skelout ();		/* %% [5.0] - break point in skel */
 	++indent_level;
 
 	out (&action_array[action_offset]);
@@ -1698,17 +1698,12 @@ void make_tables (void)
 		}
 
 	if (did_eof_rule) {
-          /*
-		++indent_level;
-		indent_puts ("yyterminate();");
-		--indent_level;
-          */
                 out_m4_define("M4_YY_DID_EOF_RULE", NULL);
 	}
 
 
 
-	skelout (); /* %% [FOO.0]
+	skelout (); /* %% [6.0]
 
 	/* Copy remainder of input to output. */
 

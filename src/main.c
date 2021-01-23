@@ -173,7 +173,7 @@ int flex_main (int argc, char *argv[])
 	/* %% [1.0] */
 
 	skelout ();
-	/* %% [1.5] DFA */
+	/* %% [2.0] DFA */
 	ntod ();
 
 	for (i = 1; i <= num_rules; ++i)
