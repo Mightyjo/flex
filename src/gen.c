@@ -330,9 +330,9 @@ static struct yytbl_data *mkssltbl (void)
 	for (i = 0; i <= lastsc * 2; ++i)
 		tdata[i] = base[i];
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_START_STATE_LIST, (void**)&yy_start_state_list, sizeof(%s)},\n",
-		    "struct yy_trans_info*");
+	buf_strappend (&yydmap_buf, "INDENT[[]]" \
+                       "YYDMAP_ENTRY_TYPE(YYTD_ID_START_STATE_LIST," \
+                       "yy_start_state_list, M4_YY_TRANS_INFO_P_TYPE)");
 
 	return tbl;
 }
@@ -462,9 +462,7 @@ static struct yytbl_data *mkecstbl (void)
 		tdata[i] = ecgroup[i];
 	}
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_EC, (void**)&yy_ec, sizeof(%s)},\n",
-		    "YY_CHAR");
+	buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_EC, yy_ec, YY_CHAR)");
 
 	return tbl;
 }
@@ -680,9 +678,8 @@ struct yytbl_data *mkftbl (void)
 				 i, anum);
 	}
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_ACCEPT, (void**)&yy_accept, sizeof(%s)},\n",
-		    long_align ? "flex_int32_t" : "flex_int16_t");
+	buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY(YYTD_ID_ACCEPT, yy_accept)");
+
 	return tbl;
 }
 
@@ -1092,9 +1089,7 @@ void gentabs (void)
 
 		out_str_dec (get_int_decl(), "yy_acclist", MAX (numas, 1) + 1);
         
-        buf_prints (&yydmap_buf,
-                "\t{YYTD_ID_ACCLIST, (void**)&yy_acclist, sizeof(%s)},\n",
-                long_align ? "flex_int32_t" : "flex_int16_t");
+        buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY(YYTD_ID_ACCLIST, yy_acclist)");
 
         yyacclist_tbl = calloc(1,sizeof(struct yytbl_data));
         yytbl_data_init (yyacclist_tbl, YYTD_ID_ACCLIST);
@@ -1200,9 +1195,7 @@ void gentabs (void)
 
 	out_str_dec (get_int_decl (), "yy_accept", k);
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_ACCEPT, (void**)&yy_accept, sizeof(%s)},\n",
-		    long_align ? "flex_int32_t" : "flex_int16_t");
+	buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY(YYTD_ID_ACCEPT, yy_accept)");
 
 	yyacc_tbl = calloc(1, sizeof (struct yytbl_data));
 	yytbl_data_init (yyacc_tbl, YYTD_ID_ACCEPT);
@@ -1273,9 +1266,7 @@ void gentabs (void)
 			       stderr);
 
 		out_str_dec (get_yy_char_decl (), "yy_meta", numecs + 1);
-		buf_prints (&yydmap_buf,
-			    "\t{YYTD_ID_META, (void**)&yy_meta, sizeof(%s)},\n",
-			    "YY_CHAR");
+		buf_strappend (&yydmap_buf,"INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_META, yy_meta, YY_CHAR)");
 
 		for (i = 1; i <= numecs; ++i) {
 			if (trace)
@@ -1304,10 +1295,12 @@ void gentabs (void)
 		     get_int32_decl () : get_int_decl (),
 		     "yy_base", total_states + 1);
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_BASE, (void**)&yy_base, sizeof(%s)},\n",
-		    (tblend >= INT16_MAX
-		     || long_align) ? "flex_int32_t" : "flex_int16_t");
+	if( tblend >= INT16_MAX ) {
+		buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_BASE, yy_base, flex_int32_t)");
+	}
+	else {
+		buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_BASE, yy_base, YY_INT_ALIGNED)");
+	}
 	yybase_tbl = calloc (1, sizeof (struct yytbl_data));
 	yytbl_data_init (yybase_tbl, YYTD_ID_BASE);
 	yybase_tbl->td_lolen = (flex_uint32_t) (total_states + 1);
@@ -1361,11 +1354,12 @@ void gentabs (void)
 		     get_int32_decl () : get_int_decl (),
 		     "yy_def", total_states + 1);
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_DEF, (void**)&yy_def, sizeof(%s)},\n",
-		    (total_states >= INT16_MAX
-		     || long_align) ? "flex_int32_t" : "flex_int16_t");
-
+	if( total_states >= INT16_MAX ) {
+          buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_DEF, yy_def, flex_int32_t)");
+	}
+	else {
+          buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_DEF, yy_def, YY_INT_ALIGNED)");
+	}
 	yydef_tbl = calloc(1, sizeof (struct yytbl_data));
 	yytbl_data_init (yydef_tbl, YYTD_ID_DEF);
 	yydef_tbl->td_lolen = (flex_uint32_t) (total_states + 1);
@@ -1393,11 +1387,12 @@ void gentabs (void)
 		     get_int32_decl () : get_int_decl (), "yy_nxt",
 		     tblend + 1);
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_NXT, (void**)&yy_nxt, sizeof(%s)},\n",
-		    (total_states >= INT16_MAX
-		     || long_align) ? "flex_int32_t" : "flex_int16_t");
-
+	if( total_states >= INT16_MAX ) {
+          buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_NXT, yy_nxt, flex_int32_t)");
+	}
+	else {
+          buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_NXT, yy_nxt, YY_INT_ALIGNED)");
+	}
 	yynxt_tbl = calloc (1, sizeof (struct yytbl_data));
 	yytbl_data_init (yynxt_tbl, YYTD_ID_NXT);
 	yynxt_tbl->td_lolen = (flex_uint32_t) (tblend + 1);
@@ -1430,11 +1425,12 @@ void gentabs (void)
 		     get_int32_decl () : get_int_decl (), "yy_chk",
 		     tblend + 1);
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_CHK, (void**)&yy_chk, sizeof(%s)},\n",
-		    (total_states >= INT16_MAX
-		     || long_align) ? "flex_int32_t" : "flex_int16_t");
-
+	if( total_states >= INT16_MAX ) {
+          buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_CHK, yy_chk, flex_int32_t)");
+	}
+	else {
+          buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_CHK, yy_chk, YY_INT_ALIGNED)");
+	}
 	yychk_tbl = calloc (1, sizeof (struct yytbl_data));
 	yytbl_data_init (yychk_tbl, YYTD_ID_CHK);
 	yychk_tbl->td_lolen = (flex_uint32_t) (tblend + 1);
@@ -1569,18 +1565,6 @@ void make_tables (void)
 		}
 	}
 
-	/* Definitions for backing up.  We don't need them if REJECT
-	 * is being used because then we use an alternative backin-up
-	 * technique instead.
-	 */
-	if (num_backing_up > 0 && !reject) {
-		if (!C_plus_plus && !reentrant) {
-			indent_puts
-				("static yy_state_type yy_last_accepting_state;");
-			indent_puts
-				("static char *yy_last_accepting_cpos;\n");
-		}
-	}
         if( num_backing_up > 0 ) {
           out_m4_define("M4_YY_NEEDS_BACKING_UP", NULL);
         }
@@ -1591,10 +1575,12 @@ void make_tables (void)
 		/* Begin generating yy_NUL_trans */
 		out_str_dec (get_state_decl (), "yy_NUL_trans",
 			     lastdfa + 1);
-		buf_prints (&yydmap_buf,
-			    "\t{YYTD_ID_NUL_TRANS, (void**)&yy_NUL_trans, sizeof(%s)},\n",
-			    (fullspd) ? "struct yy_trans_info*" :
-			    "flex_int32_t");
+		if(fullspd) {
+			buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_NUL_TRANS, yy_NUL_trans, M4_YY_TRANS_INFO_P_TYPE)");
+		}
+		else {
+			buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_LONG(YYTD_ID_NUL_TRANS, yy_NUL_trans)");
+		}
 
 		yynultrans_tbl = calloc(1, sizeof (struct yytbl_data));
 		yytbl_data_init (yynultrans_tbl, YYTD_ID_NUL_TRANS);
@@ -1607,7 +1593,7 @@ void make_tables (void)
 
 		for (i = 1; i <= lastdfa; ++i) {
 			if (fullspd) {
-				out_dec ("    &yy_transition[%d],\n",
+				out_dec ("INDENT[[]]REFERENCE_TABLE_ENTRY(yy_transition, %d)[[]]COLUMN_SEPARATOR[[]]TABLE_BLOCK[[]]",
 					 base[i]);
 				yynultrans_data[i] = base[i];
 			}
@@ -1707,14 +1693,17 @@ void make_tables (void)
 	for (i = 1; i <= lastsc; ++i)
 		if (!sceof[i]) {
 			do_indent ();
-			out_str ("case YY_STATE_EOF(%s):\n", scname[i]);
+			out_str ("EOF_RULE(%s)", scname[i]);
 			did_eof_rule = true;
 		}
 
 	if (did_eof_rule) {
+          /*
 		++indent_level;
 		indent_puts ("yyterminate();");
 		--indent_level;
+          */
+                out_m4_define("M4_YY_DID_EOF_RULE", NULL);
 	}
 
 

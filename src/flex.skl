@@ -163,6 +163,12 @@ m4_define( [[YYDMAP_ENTRY]], [[ {$1, (void**)&$2, sizeof(YY_INT_ALIGNED)},
 ]] )
 m4_define( [[YYDMAP_ENTRY_LONG]], [[ {$1, (void**)&$2, sizeof(flex_int32_t)},
 ]] )
+m4_define( [[YYDMAP_ENTRY_TYPE]], [[ {$1, (void**)&$2, sizeof($3)},
+]] )
+
+%#   Defines the syntax for matching EOF rules in yylex.
+m4_define( [[EOF_RULE]], [[case YY_STATE_EOF($1):
+]] )
 
 %#   Redefines the YY_NXT_LOLEN constant used to index tables in the C/C++ scanner
 %#      /param1 - the new (integer) value of YY_NXT_LOLEN
@@ -1165,6 +1171,19 @@ m4_ifdef( [[M4_YY_REENTRANT]], [[]], [[char *yytext;]] )
 ]] )
 %endif
 
+%if-c-only
+%# Definitions for backing up.  We don't need them if REJECT
+%# is being used because then we use an alternative backin-up
+%# technique instead.
+m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
+  m4_ifdef( [[M4_YY_USES_REJECT]], , [[
+    m4_ifdef( [[M4_YY_REENTRANT]], , [[
+static yy_state_type yy_last_accepting_state;
+static char *yy_last_accepting_cpos;
+    ]] )
+  ]] )
+]] )
+%endif
 
 %# TODO: Insert at this point the equivalents of gen.c:1879-1884.
 %% [TK] the user's section 1 definitions go here
@@ -2168,6 +2187,10 @@ m4_ifdef( [[M4_YY_USES_REJECT]], , [[
 ]] )
 
 %% [13.0] actions go here
+
+m4_ifdef( [[M4_YY_DID_EOF_RULE]], [[
+		yyterminate();
+]] )
 
 	case YY_END_OF_BUFFER:
 	{
