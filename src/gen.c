@@ -215,10 +215,12 @@ static struct yytbl_data *mkctbl (void)
 	flex_int32_t *tdata = 0, curr = 0;
 	int     end_of_buffer_action = num_rules + 1;
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_TRANSITION, (void**)&yy_transition, sizeof(%s)},\n",
-		    ((tblend + numecs + 1) >= INT16_MAX
-		     || long_align) ? "flex_int32_t" : "flex_int16_t");
+        if( (tblend + numecs + 1) >= INT16_MAX ) {
+		buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_LONG(YYTD_ID_TRANSITION, yy_transition)");
+        }
+        else {
+		buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY(YYTD_ID_TRANSITION, yy_transition)");
+        }
 
 	tbl = calloc(1, sizeof (struct yytbl_data));
 	yytbl_data_init (tbl, YYTD_ID_TRANSITION);

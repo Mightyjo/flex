@@ -152,10 +152,16 @@ m4_define( [[INDENT]], [[    ]] )
 m4_define( [[TABLE_BLOCK]], [[
 ]] )
 
+%#   Defines lookup syntax for a table entry
+m4_define( [[LOOKUP_TABLE_ENTRY]], [[$1[$2]]] )
+m4_define( [[REFERENCE_TABLE_ENTRY]], [[&$1[$2]]] )
+
 %#   Defines an entry in the table map emitted by the %tables-yydmap command
 %#      /param1 - A table ID constant
 %#      /param2 - A handle for a table, usually a symbol/name/etc
 m4_define( [[YYDMAP_ENTRY]], [[ {$1, (void**)&$2, sizeof(YY_INT_ALIGNED)},
+]] )
+m4_define( [[YYDMAP_ENTRY_LONG]], [[ {$1, (void**)&$2, sizeof(flex_int32_t)},
 ]] )
 
 %#   Redefines the YY_NXT_LOLEN constant used to index tables in the C/C++ scanner
