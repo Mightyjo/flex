@@ -68,9 +68,9 @@ static const char *get_state_decl (void)
 
 static const char *get_typed_decl (void)
 {
-  return (gentables)
-         ? "DEFINE_TYPE_ARRAY( %s, %s, %d )"
-         : "DEFINE_TYPE_TABLE_EMPTY( %s, %s )";
+	return (gentables)
+	       ? "DEFINE_TYPE_ARRAY( %s, %s, %d )"
+	       : "DEFINE_TYPE_TABLE_EMPTY( %s, %s )";
 }
 
 static const char *get_yy_char_decl (void)
@@ -99,9 +99,7 @@ static struct yytbl_data *mkeoltbl (void)
 	for (i = 1; i <= num_rules; i++)
 		tdata[i] = rule_has_nl[i] ? 1 : 0;
 
-	buf_prints (&yydmap_buf,
-		    "\t{YYTD_ID_RULE_CAN_MATCH_EOL, (void**)&yy_rule_can_match_eol, sizeof(%s)},\n",
-		    "flex_int32_t");
+	buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_LONG(YYTD_ID_RULE_CAN_MATCH_EOL, yy_rule_can_match_eol)");
 	return tbl;
 }
 
@@ -1036,8 +1034,8 @@ void make_tables (void)
 		flex_int32_t *yynultrans_data = 0;
 
 		/* Begin generating yy_NUL_trans */
-		out_str_dec (get_state_decl (), "yy_NUL_trans",
-			     lastdfa + 1);
+		out_str_dec (get_state_decl (), "yy_NUL_trans", lastdfa + 1);
+                
 		if(fullspd) {
 			buf_strappend (&yydmap_buf, "INDENT[[]]YYDMAP_ENTRY_TYPE(YYTD_ID_NUL_TRANS, yy_NUL_trans, M4_YY_TRANS_INFO_P_TYPE)");
 		}
