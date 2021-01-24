@@ -102,7 +102,7 @@ void action_define (const char *defname, int value)
 		return;
 	}
 
-	snprintf (buf, sizeof(buf), "#define %s %d\n", defname, value);
+	snprintf (buf, sizeof(buf), "M4_YY_ALIAS( [[%s]], [[%d]])\n", defname, value);
 	add_action (buf);
 
 	/* track #defines so we can undef them when we're done. */
@@ -343,7 +343,7 @@ void line_directive_out (FILE *output_file, int do_infile)
 {
 	char    directive[MAXLINE*2], filename[MAXLINE];
 	char   *s1, *s2, *s3;
-	static const char line_fmt[] = "#line %d \"%s\"\n";
+	static const char line_fmt[] = "M4_YY_LINE_DIRECTIVE( [[%d]], %s)\n";
 
 	if (!gen_line_dirs)
 		return;
@@ -745,9 +745,9 @@ void skelout (void)
 			/* print the control line as a comment. */
 			if (ddebug && buf[1] != '#') {
 				if (buf[strlen (buf) - 1] == '\\')
-					out_str ("/* %s */\\\n", buf);
+					out_str ("M4_YY_COMMENT([[ %s ]])\\\n", buf);
 				else
-					out_str ("/* %s */\n", buf);
+					out_str ("M4_YY_COMMENT([[ %s ]])\n", buf);
 			}
 
 			/* We've been accused of using cryptic markers in the skel.
@@ -767,14 +767,14 @@ void skelout (void)
             else if (cmd_match (CMD_PUSH)){
                 sko_push(do_copy);
                 if(ddebug){
-                    out_str("/*(state = (%s) */",do_copy?"true":"false");
+                    out_str("M4_YY_COMMENT([[ (state = (%s)) ]])",do_copy?"true":"false");
                 }
                 out_str("%s\n", buf[strlen (buf) - 1] =='\\' ? "\\" : "");
             }
             else if (cmd_match (CMD_POP)){
                 sko_pop(&do_copy);
                 if(ddebug){
-                    out_str("/*(state = (%s) */",do_copy?"true":"false");
+                    out_str("M4_YY_COMMENT([[ (state = (%s)) ]])",do_copy?"true":"false");
                 }
                 out_str("%s\n", buf[strlen (buf) - 1] =='\\' ? "\\" : "");
             }
@@ -806,7 +806,7 @@ void skelout (void)
 			}
             else if (cmd_match (CMD_DEFINE_YYTABLES)) {
                 if ( tablesext )
-                    out_str( "#define YYTABLES_NAME \"%s\"\n",
+                    out_str( "M4_YY_ALIAS( YYTABLES_NAME, \"%s\")",
                            tablesname ? tablesname : "yytables" );
             }
 			else if (cmd_match (CMD_IF_CPP_ONLY)) {

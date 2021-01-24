@@ -169,11 +169,13 @@ int flex_main (int argc, char *argv[])
 
 	readin ();
         
-        skelout ();
-	/* %% [1.0] */
+        skelout (); /* %% [1.0] */
+        
+        if (did_outfilename)
+          line_directive_out (stdout, 0);
 
-	skelout ();
-	/* %% [2.0] DFA */
+	skelout (); 	/* %% [2.0] DFA */
+
 	ntod ();
 
 	for (i = 1; i <= num_rules; ++i)
@@ -438,7 +440,7 @@ void check_options (void)
 		lerr (_("can't open skeleton file %s"), skelname);
 
 	if (reentrant) {
-        buf_m4_define (&m4defs_buf, "M4_YY_REENTRANT", NULL);
+		buf_m4_define (&m4defs_buf, "M4_YY_REENTRANT", NULL);
 		if (yytext_is_array)
 			buf_m4_define (&m4defs_buf, "M4_YY_TEXT_IS_ARRAY", NULL);
 	}
@@ -447,24 +449,22 @@ void check_options (void)
 		buf_m4_define (&m4defs_buf, "M4_YY_BISON_LVAL", NULL);
 
 	if ( bison_bridge_lloc)
-        buf_m4_define (&m4defs_buf, "<M4_YY_BISON_LLOC>", NULL);
+		buf_m4_define (&m4defs_buf, "<M4_YY_BISON_LLOC>", NULL);
 
-    if (strchr(prefix, '[') || strchr(prefix, ']'))
-        flexerror(_("Prefix cannot include '[' or ']'"));
-    buf_m4_define(&m4defs_buf, "M4_YY_PREFIX", prefix);
+	if (strchr(prefix, '[') || strchr(prefix, ']'))
+		flexerror(_("Prefix cannot include '[' or ']'"));
+    
+	buf_m4_define(&m4defs_buf, "M4_YY_PREFIX", prefix);
 
-	if (did_outfilename)
-		line_directive_out (stdout, 0);
+	
 
 	if (do_yylineno)
 		buf_m4_define (&m4defs_buf, "M4_YY_USE_LINENO", NULL);
 
 	/* Create the alignment type. */
-	/* buf_strdefine (&userdef_buf, "YY_INT_ALIGNED",
-		       long_align ? "long int" : "short int"); */
-    if (long_align) {
-        buf_m4_define(&m4defs_buf, "M4_YY_LONG_ALIGNED", NULL);
-    }
+	if (long_align) {
+		buf_m4_define(&m4defs_buf, "M4_YY_LONG_ALIGNED", NULL);
+	}
 
     /* Define the start condition macros. */
     {
@@ -488,7 +488,6 @@ void check_options (void)
 
     /* Put the %top code into an M4 variable. */
     if( top_buf.elts) {
-        /* outn((char*) top_buf.elts); */
         buf_m4_define(&m4defs_buf, "M4_YY_TOP_BLOCK", top_buf.elts);
         buf_destroy(&top_buf);
 		buf_init(&top_buf, sizeof(char));
@@ -496,7 +495,6 @@ void check_options (void)
 
     /* Put the user defined preproc directives into an M4 variable. */
     if (userdef_buf.elts) {
-        /* outn ((char *) (userdef_buf.elts)); */
         buf_m4_define(&m4defs_buf, "M4_YY_USERDEF", userdef_buf.elts);
         buf_destroy(&userdef_buf);
 		buf_init(&userdef_buf, sizeof(char));
@@ -508,10 +506,6 @@ void check_options (void)
     buf_print_strings(&m4defs_buf, stdout);
     buf_destroy(&m4defs_buf);
 	buf_init(&m4defs_buf, sizeof(char *));
-
-    /* Don't emit a bogus line directive since we aren't emitting code anymore. */
-    /* outn("#line 0 \"M4_YY_OUTFILE_NAME\"\n"); */
-
 
 }
 

@@ -63,18 +63,15 @@ m4_changequote([[, ]])
 %#   Define language-specific macros controlling emission.
 %#   Skeleton authors must alter these to conform to their target language.
 
+%#   Define target language features.
+m4_define( [[M4_YY_COMMENT]], [[/* $1 */]] )
+m4_define( [[M4_YY_ALIAS]], [[#define $1 $2]] )
+m4_define( [[M4_YY_LINE_DIRECTIVE]], [[#line $1 "$2"]] )
+
 %#   Define the standard input and output files, with and without initialization.
 m4_define( [[M4_YY_STDFILES]], [[extern FILE *yyin, *yyout;]] )
 m4_define( [[M4_YY_STDINIT]], [[FILE *yyin=stdin, *yyout=stdout;]] )
 m4_define( [[M4_YY_NO_STDINIT]], [[FILE *yyin=NULL, *yyout=NULL;]] )
-
-%#   Defines table alignment macro.  
-%#   The test macro is defined when the -Ca command line argument is specified.
-%#   Possibly only useful in skeletons for C/C++ and kin.
-m4_ifdef([[M4_YY_LONG_ALIGNED]], [[
-#define YY_INT_ALIGNED flex_int32_t]], [[
-#define YY_INT_ALIGNED flex_int16_t
-]] )
 
 %#   Defines type macros emitted by flex.
 m4_define( [[M4_YY_TRANS_INFO_TYPE]], [[struct yy_trans_info]] )
@@ -247,6 +244,14 @@ m4_define( [[RESET_NXT_LOLEN]], [[#undef YY_NXT_LOLEN
 %#
 
 %% [1.0] Pause to allow Flex to set options from the command line, etc.
+
+%#   Defines table alignment macro.  
+%#   The test macro is defined when the -Ca command line argument is specified.
+%#   Possibly only useful in skeletons for C/C++ and kin.
+m4_ifdef([[M4_YY_LONG_ALIGNED]], [[
+#define YY_INT_ALIGNED flex_int32_t]], [[
+#define YY_INT_ALIGNED flex_int16_t
+]] )
 
 %#   Emit the user-defined top block from the input.
 m4_ifdef( [[M4_YY_TOP_BLOCK]], M4_YY_TOP_BLOCK )
