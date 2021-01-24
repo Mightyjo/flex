@@ -1721,26 +1721,77 @@ m4_ifdef( [[M4_YY_BOL_NEEDED]], [[ \
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
-%# [[M4_YY_NEEDS_BACKING_UP]] is set in gen.c:make_tables() after the DFA is generated and emitted.
+m4_define( [[M4_YY_BACKING_UP]], [[
 m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
-  m4_ifdef( [[M4_YY_USES_REJECT]], [[
-#define YY_BACKING_UP
-  ]], [[
-#define YY_BACKING_UP \
-    m4_ifdef( [[M4_YY_FULLSPD]], [[ \
-	if ( yy_current_state[-1].yy_nxt ) \
-    ]], [[ \
-	if ( yy_accept[yy_current_state] ) \
-    ]] ) \
-	{ \
-		YY_G(yy_last_accepting_state) = yy_current_state; \
-		YY_G(yy_last_accepting_cpos) = yy_cp; \
-	} \
+  m4_ifdef( [[M4_YY_USES_REJECT]], , [[
+    m4_ifdef( [[M4_YY_FULLSPD]], [[
+	if ( yy_current_state[-1].yy_nxt ) {
+    ]], [[
+	if ( yy_accept[yy_current_state] ) {
+    ]] )
+		YY_G(yy_last_accepting_state) = yy_current_state;
+		YY_G(yy_last_accepting_cpos) = yy_cp;
+	}
+    ]] )
   ]] )
-]], [[
-#define YY_BACKING_UP
+]] )
+
+m4_define( [[M4_YY_NEXT_COMPRESSED_STATE]], [[
+	YY_CHAR yy_c = $1[[]];
+
+	 /* Save the backing-up info \before/ computing the next state
+	 * because we always compute one more state than needed - we
+	 * always proceed until we reach a jam state
+	 */
+	M4_YY_BACKING_UP()
+
+	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+	{
+		yy_current_state = (int) yy_def[yy_current_state];
+
+  m4_ifdef( [[M4_YY_USE_MECS]], [[
+		/* We've arranged it so that templates are never chained
+		 * to one another.  This means we can afford to make a
+		 * very simple test to see if we need to convert to
+		 * yy_c's meta-equivalence class without worrying
+		 * about erroneously looking up the meta-equivalence
+		 * class twice
+		 */
+
+		/* [[M4_YY_LASTDFA]] (magic number M4_YY_LASTDFA[[]]) + 2 is the beginning of the templates */
+		if ( yy_current_state >= ( M4_YY_LASTDFA + 2) )
+			yy_c = yy_meta[yy_c];
+  ]] )
+	}
+	
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
+]] )
+
+m4_define( [[M4_YY_GEN_START_STATE]], [[
+m4_ifdef( [[M4_YY_FULLSPD]], [[
+  m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
+		yy_current_state = yy_start_state_list[YY_G(yy_start) + YY_AT_BOL()];
+  ]], [[
+		yy_current_state = yy_start_state_list[YY_G(yy_start)];
+  ]] )
+]],[[
+		yy_current_state = YY_G(yy_start);
+
+  m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
+		yy_current_state += YY_AT_BOL();
+  ]] )
+
+  m4_ifdef( [[M4_YY_USES_REJECT]], [[
+		/* Set up for storing up states. */
+		YY_G(yy_state_ptr) = YY_G(yy_state_buf);
+		*YY_G(yy_state_ptr)++ = yy_current_state;
+  ]] )
 ]] )
 ]] )
+
+]] )
+
+
 
 
 %not-for-header
@@ -1845,25 +1896,7 @@ m4_ifdef( [[M4_YY_MORE_USED]], [[
 		 */
 		yy_bp = yy_cp;
 
-m4_ifdef( [[M4_YY_FULLSPD]], [[
-  m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
-		yy_current_state = yy_start_state_list[YY_G(yy_start) + YY_AT_BOL()];
-  ]], [[
-		yy_current_state = yy_start_state_list[YY_G(yy_start)];
-  ]] )
-]],[[
-		yy_current_state = YY_G(yy_start);
-
-  m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
-		yy_current_state += YY_AT_BOL();
-  ]] )
-
-  m4_ifdef( [[M4_YY_USES_REJECT]], [[
-		/* Set up for storing up states. */
-		YY_G(yy_state_ptr) = YY_G(yy_state_buf);
-		*YY_G(yy_state_ptr)++ = yy_current_state;
-  ]] )
-]] )
+		M4_YY_GEN_START_STATE()
 
 yy_match:
 m4_ifdef( [[M4_YY_USE_ECS]], [[
@@ -1882,7 +1915,7 @@ m4_ifdef( [[M4_YY_FULLTBL]], [[
   ]] )
   m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
 		{
-		YY_BACKING_UP
+		M4_YY_BACKING_UP
   ]] )
 		++yy_cp;
   m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
@@ -1903,7 +1936,7 @@ m4_ifdef( [[M4_YY_FULLTBL]], [[
 			yy_current_state += yy_trans_info->yy_nxt;
     m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
   
-			YY_BACKING_UP
+			M4_YY_BACKING_UP
 			}
     ]] )
 		}
@@ -1912,60 +1945,35 @@ m4_ifdef( [[M4_YY_FULLTBL]], [[
 		{
 
 %# /* Expansion/translation of gen_next_state(false); defined in gen.c */
-    m4_ifdef( [[M4_YY_FULLTBL]], [[
-      m4_ifdef( [[M4_YY_GENTABLES]], [[
-			yy_current_state = yy_nxt[yy_current_state][ M4_YY_ECS_CHAR_MAP ];
-      ]], [[
-			yy_current_state = yy_nxt[yy_current_state*YY_NXT_LOLEN + M4_YY_ECS_CHAR_MAP ];
-      ]] )
-    ]], [[
-      m4_ifdef( [[M4_YY_FULLSPD]], [[
-		yy_current_state += yy_current_state[ M4_YY_ECS_CHAR_MAP ].yy_nxt;
-      ]], [[
-		/* gen_next_compressed_state (char_map); */
-                YY_CHAR yy_c = M4_YY_ECS_CHAR_MAP ;
-
-		/* Save the backing-up info \before/ computing the next state
-		 * because we always compute one more state than needed - we
-		 * always proceed until we reach a jam state
-		 */
-		YY_BACKING_UP
-
-		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-		{
-			yy_current_state = (int) yy_def[yy_current_state];
-
-        m4_ifdef( [[M4_YY_USE_MECS]], [[
-			/* We've arrange it so that templates are never chained
-			 * to one another.  This means we can afford to make a
-			 * very simple test to see if we need to convert to
-			 * yy_c's meta-equivalence class without worrying
-			 * about erroneously looking up the meta-equivalence
-			 * class twice
-			 */
-
-			/* [[M4_YY_LASTDFA]] (magic number M4_YY_LASTDFA[[]]) + 2 is the beginning of the templates */
-			if ( yy_current_state >= ( M4_YY_LASTDFA + 2) )
-				yy_c = yy_meta[yy_c];
+      m4_ifdef( [[M4_YY_FULLTBL]], [[
+        m4_ifdef( [[M4_YY_GENTABLES]], [[
+                          yy_current_state = yy_nxt[yy_current_state][ M4_YY_ECS_CHAR_MAP ];
+        ]], [[
+                          yy_current_state = yy_nxt[yy_current_state*YY_NXT_LOLEN + M4_YY_ECS_CHAR_MAP ];
         ]] )
-		}
-		
-		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-                
+      ]], [[
+        m4_ifdef( [[M4_YY_FULLSPD]], [[
+                  yy_current_state += yy_current_state[ M4_YY_ECS_CHAR_MAP ].yy_nxt;
+        ]], [[
+                  /* gen_next_compressed_state (char_map); */
+                  M4_YY_NEXT_COMPRESSED_STATE(M4_YY_ECS_CHAR_MAP)
+                  
+        ]] )
       ]] )
-    ]] )
 
-    m4_ifdef( [[M4_YY_FULLSPD]], [[
-		YY_BACKING_UP
-    ]], [[
-      m4_ifdef( [[M4__YY_FULLTBL]], [[
-		YY_BACKING_UP
+      m4_ifdef( [[M4_YY_FULLSPD]], [[
+                  M4_YY_BACKING_UP
+      ]], [[
+        m4_ifdef( [[M4__YY_FULLTBL]], [[
+                  M4_YY_BACKING_UP
+        ]] )
       ]] )
-    ]] )
 
-    m4_ifdef( [[M4_YY_USES_REJECT]], [[
-		*YY_G(yy_state_ptr)++ = yy_current_state;
-    ]] )
+      m4_ifdef( [[M4_YY_USES_REJECT]], [[
+                  *YY_G(yy_state_ptr)++ = yy_current_state;
+      ]] )
+%# End of gen_next_state(false)
+    
 		++yy_cp;
 		}
     m4_ifdef( [[M4_YY_INTERACTIVE]], [[
@@ -2646,23 +2654,7 @@ m4_ifdef( [[M4_YY_USES_REJECT]],
 	char *yy_cp;
     M4_YY_DECL_GUTS_VAR();
 
-m4_ifdef( [[M4_YY_FULLSPD]], [[
-  m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
-	yy_current_state = yy_start_state_list[YY_G(yy_start) + YY_AT_BOL()];
-  ]], [[
-	yy_current_state = yy_start_state_list[YY_G(yy_start)];
-  ]] )
-]], [[
-	yy_current_state = YY_G(yy_start);
-  m4_ifdef( [[M4_YY_BOL_NEEDED]], [[
-	yy_current_state += YY_AT_BOL();
-  ]] )
-
-  m4_ifdef( [[M4_YY_USES_REJECT]], [[
-	YY_G(yy_state_ptr) = YY_G(yy_state_buf);
-	*YY_G(yy_state_ptr)++ = yy_current_state;
-  ]] )
-]] )
+    M4_YY_GEN_START_STATE()
 
 	for ( yy_cp = YY_G(yytext_ptr) + YY_MORE_ADJ; yy_cp < YY_G(yy_c_buf_p); ++yy_cp )
 	{
@@ -2685,7 +2677,7 @@ m4_ifdef( [[M4_YY_NULTRANS]], [[
   m4_ifdef( [[M4_YY_FULLTBL]], , [[
     m4_ifdef( [[M4_YY_FULLSPD]], , [[
 	/* Compressed tables back up *before* they match. */
-	YY_BACKING_UP
+	M4_YY_BACKING_UP
     ]] )
   ]] )
 	if ( *yy_cp )
@@ -2703,34 +2695,7 @@ m4_ifdef( [[M4_YY_FULLTBL]], [[
 		yy_current_state += yy_current_state[ M4_YY_ECS_CHAR_MAP_3 ].yy_nxt;
   ]], [[
 		/* gen_next_compressed_state (char_map); */
-		YY_CHAR yy_c = M4_YY_ECS_CHAR_MAP_3[[]];
-
-		/* Save the backing-up info \before/ computing the next state
-		 * because we always compute one more state than needed - we
-		 * always proceed until we reach a jam state
-		 */
-		YY_BACKING_UP
-
-		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-		{
-			yy_current_state = (int) yy_def[yy_current_state];
-
-m4_ifdef( [[M4_YY_USE_MECS]], [[
-			/* We've arrange it so that templates are never chained
-			 * to one another.  This means we can afford to make a
-			 * very simple test to see if we need to convert to
-			 * yy_c's meta-equivalence class without worrying
-			 * about erroneously looking up the meta-equivalence
-			 * class twice
-			 */
-	
-			/* [[M4_YY_LASTDFA]] (magic number M4_YY_LASTDFA[[]]) + 2 is the beginning of the templates */
-			if ( yy_current_state >= (M4_YY_LASTDFA + 2) );
-				yy_c = yy_meta[yy_c];
-]] )
-
-		}
-		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
+		M4_YY_NEXT_COMPRESSED_STATE(M4_YY_ECS_CHAR_MAP_3)
   ]] )
 ]] )
 
@@ -2741,17 +2706,17 @@ m4_ifdef( [[M4_YY_NULTRANS]], [[
 ]] )
 
 m4_ifdef( [[M4_YY_FULLSPD]], [[
-	YY_BACKING_UP
+	M4_YY_BACKING_UP
 ]], [[
   m4_ifdef( [[M4_YY_FULLTBL]], [[
-	YY_BACKING_UP
+	M4_YY_BACKING_UP
   ]] )
 ]] )
 
 m4_ifdef( [[M4_YY_USES_REJECT]], [[
 	*YY_G(yy_state_ptr)++ = yy_current_state;
 ]] )
-
+%# End of gen_next_state(true)
 	}
 
 	return yy_current_state;
@@ -2796,34 +2761,7 @@ m4_ifdef( [[M4_YY_NULTRANS]], [[
 	yy_is_jam = (yy_trans_info->yy_verify != yy_c);
     ]], [[
 %# /*		gen_next_compressed_state ([[M4_YY_NUL_EC]]); */
-	YY_CHAR yy_c = M4_YY_NUL_EC[[]];
-
-	/* Save the backing-up info \before/ computing the next state
-	 * because we always compute one more state than needed - we
-	 * always proceed until we reach a jam state
-	 */
-	YY_BACKING_UP
-
-	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-	{
-		yy_current_state = (int) yy_def[yy_current_state];
-
-      m4_ifdef( [[M4_YY_USE_MECS]], [[
-		/* We've arrange it so that templates are never chained
-		 * to one another.  This means we can afford to make a
-		 * very simple test to see if we need to convert to
-		 * yy_c's meta-equivalence class without worrying
-		 * about erroneously looking up the meta-equivalence
-		 * class twice
-		 */
-		/* [[M4_YY_LASTDFA]] (magic number M4_YY_LASTDFA[[]]) + 2 is the beginning of the templates */
-		if ( yy_current_state >= (M4_YY_LASTDFA + 2) );
-			yy_c = yy_meta[yy_c];
-      ]] )
-
-	}
-	
-	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
+	M4_YY_NEXT_COMPRESSED_STATE(M4_YY_NUL_EC)
 		
 	yy_is_jam = (yy_current_state == M4_YY_JAMSTATE[[]]);
 
@@ -2844,13 +2782,13 @@ m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
     m4_ifdef( [[M4_YY_FULLSPD]], [[
 	if ( ! yy_is_jam )
 	{
-		YY_BACKING_UP
+		M4_YY_BACKING_UP
 	}
     ]], [[
       m4_ifdef( [[M4_YY_FULLTBL]], [[
 	if ( ! yy_is_jam )
 	{
-		YY_BACKING_UP
+		M4_YY_BACKING_UP
 	}
       ]])
     ]] )
