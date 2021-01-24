@@ -1493,6 +1493,37 @@ void make_tables (void)
 
 	out_m4_define_dec("M4_YY_NUM_RULES", num_rules);
 	out_m4_define_dec("M4_YY_END_OF_BUFFER", num_rules + 1);
+        
+        if (interactive)
+          out_m4_define( "M4_YY_INTERACTIVE", NULL );
+        
+        if (!fullspd && !fulltbl) {
+          out_m4_define_dec( "M4_YY_JAMBASE", jambase );
+          out_m4_define_dec( "M4_YY_JAMSTATE", jamstate );
+        }
+        
+        if (nultrans) {
+          out_m4_define( "M4_YY_NULTRANS", NULL );
+        }
+        
+        if (usemecs) {
+          out_m4_define( "M4_YY_USE_MECS", NULL );
+          out_m4_define_dec( "M4_YY_LASTDFA", lastdfa );
+        }
+        
+        if(variable_trailing_context_rules) {
+          out_m4_define("M4_VARIABLE_TRAILING_CONTEXT_RULES", NULL);
+        }
+        out_m4_define_hex ("M4_YY_TRAILING_MASK", (unsigned int) YY_TRAILING_MASK);
+        out_m4_define_hex ("M4_YY_TRAILING_HEAD_MASK", (unsigned int) YY_TRAILING_HEAD_MASK);
+        
+        if (use_read) {
+          out_m4_define("M4_YY_USE_READ", NULL);
+        }
+
+        if (bol_needed) {
+          out_m4_define("M4_YY_BOL_NEEDED", NULL);
+        }
     
 	if (fullspd) {
 		genctbl ();
@@ -1546,9 +1577,15 @@ void make_tables (void)
 			}
 		}
 	}
-	else
+	else {
 		gentabs ();
-
+	}
+              
+        /* num_backing_up can be changed by gentabs() so we don't  no whether backing up is needed until here. */
+	if( num_backing_up > 0 ) {
+		out_m4_define("M4_YY_NEEDS_BACKING_UP", NULL);
+	}
+              
 	if (do_yylineno) {
 
 		geneoltbl ();
@@ -1565,9 +1602,7 @@ void make_tables (void)
 		}
 	}
 
-        if( num_backing_up > 0 ) {
-          out_m4_define("M4_YY_NEEDS_BACKING_UP", NULL);
-        }
+
 
 	if (nultrans) {
 		flex_int32_t *yynultrans_data = 0;
@@ -1615,7 +1650,7 @@ void make_tables (void)
 		if (yynultrans_tbl != NULL) {
 			yytbl_data_destroy (yynultrans_tbl);
 			yynultrans_tbl = NULL;
-        }
+		}
 
 		/* End generating yy_NUL_trans */
 	}
@@ -1627,68 +1662,23 @@ void make_tables (void)
 		dataend ();
 	}
 
-    if(variable_trailing_context_rules) {
-        out_m4_define("M4_VARIABLE_TRAILING_CONTEXT_RULES", NULL);
-    }
-    out_m4_define_hex ("M4_YY_TRAILING_MASK", (unsigned int) YY_TRAILING_MASK);
-    out_m4_define_hex ("M4_YY_TRAILING_HEAD_MASK", (unsigned int) YY_TRAILING_HEAD_MASK);
-
     
-	/* The need to output the user's actions here means we still need a skelout for now.
-	 * This may be remediated by adding a % command to the skeleton down the line. 
-	 */
+	/* Emit the user's section 1 definitions into the output file. */
 	skelout ();		/* %% [3.0] - break point in skel */
-    
 	out (&action_array[defs1_offset]);
-
 	line_directive_out (stdout, 0);
-
-
-    if (use_read) {
-        out_m4_define("M4_YY_USE_READ", NULL);
-    }
     
-
-    if (bol_needed) {
-        out_m4_define("M4_YY_BOL_NEEDED", NULL);
-    }
-    
-    /* This one might be needed because of the action_array output */
+	/* Emit the user's prolog into the output file. */
 	skelout ();		/* %% [4.0] - break point in skel */
-
-	/* Copy prolog to output file. */
 	out (&action_array[prolog_offset]);
-
 	line_directive_out (stdout, 0);
-
-
-        if (interactive)
-        out_m4_define( "M4_YY_INTERACTIVE", NULL );
-        
-        if (!fullspd && !fulltbl) {
-          out_m4_define_dec( "M4_YY_JAMBASE", jambase );
-          out_m4_define_dec( "M4_YY_JAMSTATE", jamstate );
-        }
-        
-        if (nultrans) {
-          out_m4_define( "M4_YY_NULTRANS", NULL );
-        }
-        
-        if (usemecs) {
-          out_m4_define( "M4_YY_USE_MECS", NULL );
-          out_m4_define_dec( "M4_YY_LASTDFA", lastdfa );
-        }
-
-
 
 	/* Copy actions to output file. */
 	skelout ();		/* %% [5.0] - break point in skel */
-	++indent_level;
-
 	out (&action_array[action_offset]);
-
 	line_directive_out (stdout, 0);
 
+        
 	/* generate cases for any missing EOF rules */
 	for (i = 1; i <= lastsc; ++i)
 		if (!sceof[i]) {
@@ -1702,13 +1692,11 @@ void make_tables (void)
 	}
 
 
-
-	skelout (); /* %% [6.0]
-
-	/* Copy remainder of input to output. */
-
+	/* Copy remainder of skeleton to output. */
+	skelout (); /* %% [6.0] - break point in skel */
 	line_directive_out (stdout, 1);
 
+        /* Emit the user's section 3 into the output file. */
 	if (sectnum == 3) {
 		OUT_BEGIN_CODE ();
                 if (!no_section3_escape)

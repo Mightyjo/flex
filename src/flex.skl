@@ -1721,7 +1721,7 @@ m4_ifdef( [[M4_YY_BOL_NEEDED]], [[ \
 
 m4_ifdef( [[M4_YY_NOT_IN_HEADER]],
 [[
-%# [[M4_YY_NEEDS_BACKING_UP]] is set gen.c:make_tables() after skelout [4.0] if num_backing_up > 0.
+%# [[M4_YY_NEEDS_BACKING_UP]] is set in gen.c:make_tables() after the DFA is generated and emitted.
 m4_ifdef( [[M4_YY_NEEDS_BACKING_UP]], [[
   m4_ifdef( [[M4_YY_USES_REJECT]], [[
 #define YY_BACKING_UP
