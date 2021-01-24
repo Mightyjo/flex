@@ -470,8 +470,12 @@ void check_options (void)
     {
         struct Buf tmpbuf;
         buf_init(&tmpbuf, sizeof(char));
+        /* buf_m4_define() strongly protects its arguments from expansion.
+         * We specifically need to defeat that in this case.
+         */
+        buf_strappend(&tmpbuf, "]]");
         for (i = 1; i <= lastsc; i++) {
-             char *str, *fmt = "#define %s %d\n";
+             char *str, *fmt = "M4_YY_ALIAS( [[%s]], [[%d]] )\n";
              size_t strsz;
 
              strsz = strlen(fmt) + strlen(scname[i]) + (size_t)(1 + ceil (log10(i))) + 2;
@@ -482,6 +486,8 @@ void check_options (void)
              buf_strappend(&tmpbuf, str);
              free(str);
         }
+        /* Complete bypass of buf_m4_define quoting. */
+        buf_strappend(&tmpbuf, "[[");
         buf_m4_define(&m4defs_buf, "M4_YY_SC_DEFS", tmpbuf.elts);
         buf_destroy(&tmpbuf);
     }
@@ -1549,7 +1555,7 @@ void readin (void)
 		reject = true;
 	else if (reject_really_used == false)
 		reject = false;
-
+              
 	if (performance_report > 0) {
 		if (lex_compat) {
 			fprintf (stderr,

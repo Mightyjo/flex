@@ -115,7 +115,7 @@ static void geneoltbl (void)
 
 	if (gentables) {
 		for (i = 1; i <= num_rules; i++) {
-			out_dec ("TABLE_DATA(%d)[[]]COLUMN_SEPARATOR[[]] ", rule_has_nl[i] ? 1 : 0);
+			out_dec ("TABLE_DATA(%5d)[[]]COLUMN_SEPARATOR[[]]", rule_has_nl[i] ? 1 : 0);
 			/* format nicely, 20 numbers per line. */
 			if ((i % 20) == 19)
 				out ("TABLE_BLOCK[[]]INDENT[[]]");
