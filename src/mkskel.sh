@@ -36,9 +36,6 @@ VERSION=$3
 case $VERSION in
    *[!0-9.]*) echo 'Invalid version number' >&2; exit 1;;
 esac
-
-cr=$(printf "\015")
-
 IFS=.
 set $VERSION
 
@@ -52,7 +49,7 @@ sed '/^%#/d
 s/m4_/m4preproc_/g
 s/a4_/4_/g
 s/[\\"]/\\&/g
-s/[^'"${cr}"']*/  "&",/'
+s/[^'$(printf "\r")']*/  "&",/'
 
 echo '  0
 };'
