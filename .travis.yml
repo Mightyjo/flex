@@ -20,7 +20,6 @@ jobs:
     compiler: clang
     env: 
     - PATH=$PATH:/usr/local/opt/gettext/bin
-    script: ./autogen.sh && ./configure && make && make check
 
 
 addons:
@@ -39,4 +38,6 @@ addons:
     - texinfo
     - texlive
 
-script: ./autogen.sh && ./configure && make && make check && make distcheck
+script: 
+- ./autogen.sh && ./configure && make && make check
+- if [ "$TRAVIS_OS_NAME" = "linux" -a "$TRAVIS_CPU_ARCH" = "amd64" ]; then make distcheck; fi
