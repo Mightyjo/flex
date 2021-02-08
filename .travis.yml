@@ -36,7 +36,5 @@ addons:
     packages:
     - help2man
     - lzip
-    - texinfo
-
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
