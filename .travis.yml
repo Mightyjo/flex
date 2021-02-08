@@ -14,16 +14,8 @@ jobs:
     compiler: clang
     env: 
     - PATH=$PATH:/usr/local/opt/gettext/bin
-#    before_install:
-#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install help2man
-#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install lzip
-#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install texinfo
-#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install --fetch-HEAD homebrew/cask/basictex
-  exclude:
-  - os: linux
-    compiler: gcc
-  - os: linux
-    compiler: clang
+    script: ./autogen.sh && ./configure && make && make check
+
 
 addons:
   apt:
@@ -41,15 +33,10 @@ addons:
     - texinfo
     - texlive
   homebrew:
-#    update: true
     packages:
-    - mercurial
     - help2man
     - lzip
     - texinfo
-    casks:
-    - mactex
 
-script: 
-- echo $PATH
-- ./autogen.sh && ./configure && make && make check && make distcheck
+
+script: ./autogen.sh && ./configure && make && make check && make distcheck
