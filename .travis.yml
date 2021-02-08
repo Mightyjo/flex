@@ -14,11 +14,6 @@ jobs:
     compiler: clang
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.20.1/bin
-  exclude:
-  - os: linux
-    compiler: gcc
-  - os: linux
-    compiler: clang
 
 addons:
   apt:
