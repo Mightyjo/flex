@@ -39,6 +39,7 @@ addons:
     - texinfo
     - texlive
   homebrew:
+    update: true
     packages:
     - autoconf
     - automake
