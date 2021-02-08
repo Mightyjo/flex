@@ -11,6 +11,7 @@ addons:
     packages:
     - autoconf
     - automake-1.15
+    - autopoint
     - bison
     - gcc-6
     - gettext
