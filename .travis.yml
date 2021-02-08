@@ -14,14 +14,6 @@ jobs:
     compiler: clang
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
-  - os: osx
-    osx_image: xcode11
-    compiler: gcc
-    env: 
-    - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
-    - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
-    before_install:
-    - eval "${MATRIX_EVAL}"
 
 addons:
   apt:
@@ -43,8 +35,6 @@ addons:
     packages:
     - autoconf
     - automake
-    - bison
-    - gcc@6
     - gettext
     - help2man
     - lzip
