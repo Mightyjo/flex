@@ -15,8 +15,8 @@ jobs:
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
     before_install:
-    - ls -alr /usr/local/Cellar/gettext/0.20.1
-    - ls -alr /usr/local/opt/gettext/0.20.1
+    - ls -alR /usr/local/Cellar/gettext/0.20.1
+    - ls -alR /usr/local/opt/gettext/0.20.1
   exclude:
   - os: linux
     compiler: gcc
