@@ -10,16 +10,13 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - autoconf
+    - automake-1.15
     - bison
     - gcc-6
+    - gettext
     - help2man
     - lzip
     - texinfo
     - texlive
-
-before_script:
-    - ./.travis/install-gettext.sh
-    - ./.travis/install-automake.sh
-    - export PATH=$HOME/bin:$PATH
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
