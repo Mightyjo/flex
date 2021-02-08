@@ -14,11 +14,11 @@ jobs:
     compiler: clang
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.20.1/bin
-    before_install:
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew install help2man
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew install lzip
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew install texinfo
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew install --fetch-HEAD homebrew/cask/basictex
+#    before_install:
+#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install help2man
+#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install lzip
+#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install texinfo
+#    - HOMEBREW_NO_AUTO_UPDATE=1 brew install --fetch-HEAD homebrew/cask/basictex
   exclude:
   - os: linux
     compiler: gcc
@@ -40,11 +40,13 @@ addons:
     - lzip
     - texinfo
     - texlive
-#  homebrew:
-#    update: true
-#    packages:
-#    - help2man
-#    casks:
-#    - mactex
+  homebrew:
+    update: true
+    packages:
+    - help2man
+    - lzip
+    - texinfo
+    casks:
+    - mactex
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
