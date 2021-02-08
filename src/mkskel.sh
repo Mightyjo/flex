@@ -21,8 +21,6 @@
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 #  PURPOSE.
 
-cr=$(printf "\015")
-
 if test ! $# = 3; then
    echo 'Usage: mkskel.sh srcdir m4 version' >&2
    exit 1
@@ -38,8 +36,12 @@ VERSION=$3
 case $VERSION in
    *[!0-9.]*) echo 'Invalid version number' >&2; exit 1;;
 esac
+
+cr=$(printf "\015")
+
 IFS=.
 set $VERSION
+
 sed 's/4_/a4_/g
 s/m4preproc_/m4_/g
 ' "$srcdir/flex.skl" |
@@ -50,7 +52,7 @@ sed '/^%#/d
 s/m4_/m4preproc_/g
 s/a4_/4_/g
 s/[\\"]/\\&/g
-s/[^$cr]*/  "&",/'
+s/[^'"${cr}"']*/  "&",/'
 
 echo '  0
 };'
