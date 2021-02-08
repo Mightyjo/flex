@@ -15,8 +15,8 @@ jobs:
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
     before_install:
-    - brew install gettext
-    - brew install --cask mactex
+    - HOMEBREW_NO_AUTO_UPDATE=1 brew install gettext
+    - HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask mactex
 
 addons:
   apt:
