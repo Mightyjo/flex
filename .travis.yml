@@ -4,6 +4,28 @@ compiler:
   - gcc
   - clang
 
+os:
+  - linux
+  
+jobs:
+  include:
+  - os: osx
+    osx_image: xcode8
+    compiler: clang
+    env: 
+      - PATH=/usr/local/opt/gettext/bin:$PATH
+    before_install:
+      - eval "$(/usr/libexec/path_helper)"
+  - os: osx
+    osx_image: xcode8
+    compiler: gcc
+    env: 
+      - PATH=/usr/local/opt/gettext/bin:$PATH
+      - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
+    before_install:
+      - eval "${MATRIX_EVAL}"
+      - eval "$(/usr/libexec/path_helper)"
+
 addons:
   apt:
     sources:
@@ -19,5 +41,17 @@ addons:
     - lzip
     - texinfo
     - texlive
+  homebrew:
+    packages:
+    - autoconf
+    - automake
+    - bison
+    - gcc@6
+    - gettext
+    - help2man
+    - lzip
+    - texinfo
+    casks:
+    - mactex
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
