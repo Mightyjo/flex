@@ -13,7 +13,7 @@ jobs:
     osx_image: xcode11
     compiler: clang
     env: 
-    - PATH=$PATH:/usr/local/Cellar/gettext/0.20.1/bin
+    - PATH=$PATH:/usr/local/opt/gettext/bin
 #    before_install:
 #    - HOMEBREW_NO_AUTO_UPDATE=1 brew install help2man
 #    - HOMEBREW_NO_AUTO_UPDATE=1 brew install lzip
@@ -41,12 +41,15 @@ addons:
     - texinfo
     - texlive
   homebrew:
-    update: true
+#    update: true
     packages:
+    - mercurial
     - help2man
     - lzip
     - texinfo
     casks:
     - mactex
 
-script: ./autogen.sh && ./configure && make && make check && make distcheck
+script: 
+- echo $PATH
+- ./autogen.sh && ./configure && make && make check && make distcheck
