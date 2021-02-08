@@ -14,8 +14,6 @@ jobs:
     compiler: clang
     env: 
       - PATH=/usr/local/Cellar/gettext/0.21/bin:$PATH
-    before_install:
-      - eval "$(/usr/libexec/path_helper)"
   - os: osx
     osx_image: xcode8
     compiler: gcc
