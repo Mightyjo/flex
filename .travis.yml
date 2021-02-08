@@ -16,7 +16,7 @@ jobs:
     - PATH=$PATH:/usr/local/Cellar/gettext/0.20.1/bin
     before_install:
     - HOMEBREW_NO_AUTO_UPDATE=1 brew install help2man
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew cask install caskroom/casks/mactex
+    - HOMEBREW_NO_AUTO_UPDATE=1 brew cask install mactex
   exclude:
   - os: linux
     compiler: gcc
