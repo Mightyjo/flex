@@ -14,6 +14,9 @@ jobs:
     compiler: clang
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
+    before_install:
+    - brew install gettext
+    - brew install --cask mactex
 
 addons:
   apt:
@@ -30,16 +33,5 @@ addons:
     - lzip
     - texinfo
     - texlive
-  homebrew:
-    update: true
-    packages:
-    - autoconf
-    - automake
-    - gettext
-    - help2man
-    - lzip
-    - texinfo
-    casks:
-    - mactex
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
