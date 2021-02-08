@@ -16,7 +16,9 @@ jobs:
     - PATH=$PATH:/usr/local/Cellar/gettext/0.20.1/bin
     before_install:
     - HOMEBREW_NO_AUTO_UPDATE=1 brew install help2man
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew install --fetch-HEAD homebrew/cask/mactex
+    - HOMEBREW_NO_AUTO_UPDATE=1 brew install lzip
+    - HOMEBREW_NO_AUTO_UPDATE=1 brew install texinfo
+    - HOMEBREW_NO_AUTO_UPDATE=1 brew install --fetch-HEAD homebrew/cask/basictex
   exclude:
   - os: linux
     compiler: gcc
