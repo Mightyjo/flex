@@ -15,7 +15,13 @@ jobs:
     env: 
     - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
     before_install:
-    - HOMEBREW_NO_AUTO_UPDATE=1 brew install gettext
+    - ls -alr /usr/local/Cellar/gettext
+    - ls -alr /usr/local/opt/gettext 
+  exclude:
+  - os: linux
+    compiler: gcc
+  - os: linux
+    compiler: clang
 
 addons:
   apt:
