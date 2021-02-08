@@ -32,9 +32,9 @@ addons:
     - lzip
     - texinfo
     - texlive
-  homebrew:
-    packages:
-    - help2man
-    - lzip
+#  homebrew:
+#    packages:
+#    - help2man
+#    - lzip
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
