@@ -48,7 +48,7 @@ sed '/^%#/d
 s/m4_/m4preproc_/g
 s/a4_/4_/g
 s/[\\"]/\\&/g
-s/[^"$(printf \r)"]*/  "&",/'
+s/[^$(printf "\r")]*/  "&",/'
 
 echo '  0
 };'
