@@ -13,14 +13,14 @@ jobs:
     osx_image: xcode8
     compiler: clang
     env: 
-      - PATH=/usr/local/Cellar/gettext/bin:$PATH
+      - PATH=/usr/local/Cellar/gettext/0.21/bin:$PATH
     before_install:
       - eval "$(/usr/libexec/path_helper)"
   - os: osx
     osx_image: xcode8
     compiler: gcc
     env: 
-      - PATH=/usr/local/Cellar/gettext/bin:$PATH
+      - PATH=/usr/local/Cellar/gettext/0.21/bin:$PATH
       - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
     before_install:
       - eval "${MATRIX_EVAL}"
