@@ -21,6 +21,8 @@
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 #  PURPOSE.
 
+cr=$(printf "\015")
+
 if test ! $# = 3; then
    echo 'Usage: mkskel.sh srcdir m4 version' >&2
    exit 1
@@ -48,7 +50,7 @@ sed '/^%#/d
 s/m4_/m4preproc_/g
 s/a4_/4_/g
 s/[\\"]/\\&/g
-s/[^$(printf "\r")]*/  "&",/'
+s/[^$cr]*/  "&",/'
 
 echo '  0
 };'
