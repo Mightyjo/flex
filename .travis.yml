@@ -13,10 +13,7 @@ jobs:
     osx_image: xcode11
     compiler: clang
     env: 
-    - PATH=$PATH:/usr/local/Cellar/gettext/0.21/bin
-    before_install:
-    - ls -alR /usr/local/Cellar/gettext/0.20.1
-    - ls -alR /usr/local/opt/gettext/0.20.1
+    - PATH=$PATH:/usr/local/Cellar/gettext/0.20.1/bin
   exclude:
   - os: linux
     compiler: gcc
