@@ -35,5 +35,11 @@ addons:
     - lzip
     - texinfo
     - texlive
+  homebrew:
+    update: true
+    packages:
+    - help2man
+    casks:
+    - mactex
 
 script: ./autogen.sh && ./configure && make && make check && make distcheck
