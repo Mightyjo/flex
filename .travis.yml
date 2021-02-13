@@ -48,7 +48,7 @@ deploy:
   - "flex-2.6.4.tar.gz.sig"
   - "flex-2.6.4.tar.lz"
   - "flex-2.6.4.tar.lz.sig"
-  skip_cleanup: true
+  edge: true
   draft: true
   on:
     tags: true
