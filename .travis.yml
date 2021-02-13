@@ -49,10 +49,5 @@ deploy:
   - "flex-2.6.4.tar.lz"
   - "flex-2.6.4.tar.lz.sig"
   edge: true
-  draft: true
   on:
     tags: true
-    name: $TRAVIS_TAG
-    tag_name: $TRAVIS_TAG
-
-
