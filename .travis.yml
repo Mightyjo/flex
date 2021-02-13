@@ -21,6 +21,19 @@ jobs:
     env: 
     - PATH=$PATH:/usr/local/opt/gettext/bin
 
+deploy:
+  provider: releases
+  api_key:
+    secure: "s3cYHO30ocvSdvFMgndw6VTtNDHn6BVmtbKjr8o2LIrkqSHPVx0FsniIZFlVcuhOdkZDMV0/EfffWv8CIUYDyUQUsB5QfojxWt/oSFM3v1gPF1eGLcQtKPNZUAHZvvLrFTwbmKV1SScoa11Lt5zhxaNZTI4IWhV9mcDeTIxyaQfcqusuTdnx4wl7JtncOcrR1NRUj8NnqqP68RWpQdpfrTMWWerE7/m92IrHBe076yb9hJx00I3LBVg93IwI4GCONnuxhlLR99uyZQ3n5HmJ94LebsTh+nDVmzy5TrXq9rsHoNv7wY/4trflxY+t4h0XilLLimj78Fpd90mDL9zOyajTbjqs3wqRPxBrhPJcKJp/6f5itB8+wn3WjnVzTG2PbrTActnmBANimkrUzeRaKqdt7E2m4d27cm0FRyIJTDQ6/NxzEeOls/k+/P7jpa1tPMHOrlbCe40RuwHcZ5YKCEsTFWpMJbRDL/oSQtJGS83QVj5MyeIl6gVUIqfz6nZd1nmS25ZLb2qtlufma0FNnoqzs4xi3NgNrKUi/kYWYuBtIzH81px15hGICsxwBvl6Q+QH96e/h2JDft9YWhGpORz8Pepx06kvVSJjbvYqR1mfhNs5CjEw+8fZ6GPOMb2NEbDVovB5yGv/0cskd4x/RAYxS+49OKGM/fZWRnkGIK0="
+  file: 
+  - "flex-2.6.4.tar.gz"
+  - "flex-2.6.4.tar.gz.sig"
+  - "flex-2.6.4.tar.lz"
+  - "flex-2.6.4.tar.lz.sig"
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
 
 addons:
   apt:
@@ -40,4 +53,4 @@ addons:
 
 script: 
 - ./autogen.sh && ./configure && make && make check
-- if [ "$TRAVIS_OS_NAME" = "linux" -a "$TRAVIS_CPU_ARCH" = "amd64" ]; then make distcheck; fi
+- if [ "$TRAVIS_OS_NAME" = "linux" -a "$TRAVIS_CPU_ARCH" = "amd64" - "$CC" = "gcc" ]; then make distcheck; fi
