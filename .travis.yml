@@ -13,28 +13,6 @@ arch:
   - s390x
   - arm64
   
-jobs:
-  include:
-  - os: osx
-    osx_image: xcode11
-    compiler: clang
-    env: 
-    - PATH=$PATH:/usr/local/opt/gettext/bin
-
-deploy:
-  provider: releases
-  file: 
-  - "flex-2.6.4.tar.gz"
-  - "flex-2.6.4.tar.gz.sig"
-  - "flex-2.6.4.tar.lz"
-  - "flex-2.6.4.tar.lz.sig"
-  edge: true
-  draft: true
-  on:
-    tags: true
-    os: linux
-    condition: env(TRAVIS_CPU_ARCH) = amd64 and env(CC_FOR_BUILD) = gcc
-
 addons:
   apt:
     sources:
@@ -54,3 +32,28 @@ addons:
 script: 
 - ./autogen.sh && ./configure && make && make check
 - if [ "$TRAVIS_OS_NAME" = "linux" -a "$TRAVIS_CPU_ARCH" = "amd64" -a "$CC" = "gcc" ]; then make distcheck; fi
+  
+jobs:
+  include:
+  - os: osx
+    osx_image: xcode11
+    compiler: clang
+    env: 
+    - PATH=$PATH:/usr/local/opt/gettext/bin
+  - stage: deploy
+    language: c
+    compiler: gcc
+    os: linux
+    arch: amd64
+    deploy:
+      provider: releases
+      file: 
+      - "flex-2.6.4.tar.gz"
+      - "flex-2.6.4.tar.gz.sig"
+      - "flex-2.6.4.tar.lz"
+      - "flex-2.6.4.tar.lz.sig"
+      edge: true
+      draft: true
+      on:
+        tags: true
+    
