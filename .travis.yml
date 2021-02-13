@@ -54,5 +54,5 @@ deploy:
     tags: true
     name: $TRAVIS_TAG
     tag_name: $TRAVIS_TAG
-    condition: $TRAVIS_OS_NAME = linux AND $TRAVIS_CPU_ARCH = amd64 AND $CC_FOR_BUILD = gcc
+
 
