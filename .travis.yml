@@ -53,4 +53,4 @@ addons:
 
 script: 
 - ./autogen.sh && ./configure && make && make check
-- if [ "$TRAVIS_OS_NAME" = "linux" -a "$TRAVIS_CPU_ARCH" = "amd64" - "$CC" = "gcc" ]; then make distcheck; fi
+- if [ "$TRAVIS_OS_NAME" = "linux" -a "$TRAVIS_CPU_ARCH" = "amd64" -a "$CC" = "gcc" ]; then make distcheck; fi
