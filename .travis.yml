@@ -58,5 +58,6 @@ jobs:
         tags: true
     
 stages:
+  - name: test
   - name: deploy
     if: tag is present
