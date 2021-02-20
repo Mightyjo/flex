@@ -28,9 +28,9 @@ jobs:
       - name: make distcheck
         run: make distcheck
       - name: Get artifact names
-        run: 
-        - echo "ARTIFACT_GZ=$(echo flex-*.tar.gz)" >> $GITHUB_ENV
-        - echo "ARTIFACT_LZ=$(echo flex-*.tar.lz)" >> $GITHUB_ENV
+        run: |
+          echo "ARTIFACT_GZ=$(echo flex-*.tar.gz)" >> $GITHUB_ENV
+          echo "ARTIFACT_LZ=$(echo flex-*.tar.lz)" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
