@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: apt
+      run: sudo apt install autoconf bison gcc-6 help2man lzip texinfo texlive
     - name: autogen
       run: ./autogen.sh
     - name: configure
