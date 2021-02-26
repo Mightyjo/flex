@@ -1,13 +1,13 @@
-name: Release
+name: Milestone
 
 on:
   release:
-    types: [created]
+    types: [closed]
 
 
 jobs:
   release:
-    name: Make release
+    name: Close out Milestone
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout code
