@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install Ruby Gems
+        run: |
+          gem install octokit
+          gem install json
       - name: info
         run: |
           cat $GITHUB_EVENT_PATH
