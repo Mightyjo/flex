@@ -18,7 +18,9 @@ jobs:
           gem install json
       - name: Generate NEWS
         run: |
-          ruby mileston_close.rb ${{ secrets.GITHUB_TOKEN }}
+          ruby mileston_close.rb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit and Push
         run: |
           mv $GITHUB_WORKSPACE/NEWS.new $GITHUB_WORKSPACE/NEWS

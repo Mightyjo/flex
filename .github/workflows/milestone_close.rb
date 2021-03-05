@@ -1,7 +1,7 @@
 require 'octokit'
 require 'json'
 
-token = ARGV[0]
+token = ENV["GITHUB_TOKEN"]
 
 client = Octokit::Client.new(:auth_token => token)
 client.auto_paginate = true
