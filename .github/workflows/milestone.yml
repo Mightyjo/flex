@@ -16,6 +16,17 @@ jobs:
         run: |
           gem install octokit
           gem install json
-      - name: info
+      - name: Generate NEWS
         run: |
-          cat $GITHUB_EVENT_PATH
+          ruby mileston_close.rb
+      - name: Commit and Push
+        run: |
+          mv $GITHUB_WORKSPACE/NEWS.new $GITHUB_WORKSPACE/NEWS
+          git add $GITHUB_WORKSPACE/NEWS
+          git commit -m "chore(release): Update NEWS"
+          git push
+      - name: Create Tag
+        run: |
+          TAG_NAME=`cat milestone.meta` && git tag -a $TAG_NAME -m "chore(release): Prepare tag for release $TAGNAME"
+          rm milestone.meta
+          

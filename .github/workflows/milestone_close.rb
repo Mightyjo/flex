@@ -1,21 +1,23 @@
 require 'octokit'
 require 'json'
 
-client = Octokit::Client.new(:auth_token => '77d74a2d71af81c0643efe70a4ad3d286608fc29')
+token = ARGV[0]
+
+client = Octokit::Client.new(:auth_token => token)
 client.auto_paginate = true
 
-event = JSON.parse( File.read("C:\\Users\\Joe\\milestone_event.json") )
+event = JSON.parse( File.read("#{ENV["GITHUB_EVENT_PATH"]}") )
 milestone = {number: event["milestone"]["number"], title: event["milestone"]["title"]} 
 
 now = Time.now
 news = Array.new
 
-client.list_issues("westes/flex", :milestone => milestone[:number], :state => "closed").each do |issue|
+client.list_issues("#{ENV["GITHUB_REPOSITORY"]}", :milestone => milestone[:number], :state => "closed").each do |issue|
   news.push "##{issue.number}: #{issue.title} (#{issue.milestone.title}) [#{issue.labels.reduce(" ") {|r, label| r + label.name + " "}}]"
 end
 
-infile = File.open("D:\\Users\\Joe\\Documents\\GitHub\\flex\\NEWS")
-outfile = File.open("D:\\Users\\Joe\\Documents\\GitHub\\flex\\NEWS.new", "w")
+infile = File.open("#{ENV["GITHUB_WORKSPACE"]}/NEWS")
+outfile = File.open("#{ENV["GITHUB_WORKSPACE"]}/NEWS.new", "w")
 
 outfile.write infile.gets
 
@@ -28,3 +30,7 @@ infile.each {|l| outfile.write l}
 
 infile.close
 outfile.close
+
+meta = File.open("mileston.meta", "w")
+meta.write "#{milestone[:title]}"
+meta.close
