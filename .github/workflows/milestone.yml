@@ -17,7 +17,7 @@ jobs:
           sudo gem install octokit json
       - name: Generate NEWS
         run: |
-          echo "TAG_NAME=$(ruby milestone_close.rb)" >> $GITHUB_ENV
+          echo "TAG_NAME=$(ruby $GITHUB_WORKSPACE/.github/workflows/milestone_close.rb)" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit and Push
