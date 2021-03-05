@@ -31,6 +31,4 @@ infile.each {|l| outfile.write l}
 infile.close
 outfile.close
 
-meta = File.open("mileston.meta", "w")
-meta.write "#{milestone[:title]}"
-meta.close
+puts "#{milestone[:title]}"

@@ -18,7 +18,7 @@ jobs:
           gem install json
       - name: Generate NEWS
         run: |
-          ruby mileston_close.rb
+          echo "TAG_NAME=$(ruby mileston_close.rb)" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit and Push
@@ -29,6 +29,6 @@ jobs:
           git push
       - name: Create Tag
         run: |
-          TAG_NAME=`cat milestone.meta` && git tag -a $TAG_NAME -m "chore(release): Prepare tag for release $TAGNAME"
+          git tag -a $TAG_NAME -m "chore(release): Prepare tag for release $TAGNAME"
           rm milestone.meta
           
