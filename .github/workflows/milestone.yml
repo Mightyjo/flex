@@ -24,6 +24,8 @@ jobs:
         run: |
           mv $GITHUB_WORKSPACE/NEWS.new $GITHUB_WORKSPACE/NEWS
           git add $GITHUB_WORKSPACE/NEWS
+          git config --global user.email "runner@github.com"
+          git config --global user.name "GitHub Actions Runner"
           git commit -m "chore(release): Update NEWS"
           git push
       - name: Create Tag
