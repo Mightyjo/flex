@@ -13,11 +13,13 @@ jobs:
           git archive -o flex-${{ env.GITHUB_SHA }}.tar.gz --prefix=flex-${{ env.GITHUB_SHA }}/ HEAD
           TZ=America/Los_Angeles git archive -o flex-${{ env.GITHUB_SHA }}.zip --prefix=flex-${{ env.GITHUB_SHA }}/ HEAD
       - name: Prepare GPG
-        env: GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+        env: 
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
         run: |
           echo "$GPG_SIGNING_KEY" | gpg --batch --import
       - name: Sign tarballs
-        env: GPG_SIGNING_PASSWD: ${{ secrets.GPG_SIGNING_PASSWD }}
+        env: 
+          GPG_SIGNING_PASSWD: ${{ secrets.GPG_SIGNING_PASSWD }}
         run: |
           echo "$GPG_SIGNING_PASSWD" | gpg --passwd-fd 0 --armor --detach-sign flex-${{ env.GITHUB_SHA }}.tar.gz
           echo "$GPG_SIGNING_PASSWD" | gpg --passwd-fd 0 --armor --detach-sign flex-${{ env.GITHUB_SHA }}.zip
