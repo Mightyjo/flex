@@ -18,11 +18,13 @@ jobs:
         run: |
           gpg --version
           mkdir -m 700 .ghgpg
-          echo "$GPG_SIGNING_KEY" | gpg --homedir .ghphp --batch --import
+          export GNUPGHOME=.ghgpg
+          echo "$GPG_SIGNING_KEY" | gpg --batch --import
       - name: Sign tarballs
         env: 
           GPG_SIGNING_PASSWD: ${{ secrets.GPG_SIGNING_PASSWD }}
         run: |
+          export GNUPGHOME=.ghgpg
           echo "$GPG_SIGNING_PASSWD" | gpg --homedir .ghphp --pinentry-mode loopback --passphrase-fd 0 --armor --detach-sign flex-$GITHUB_SHA.tar.gz
           echo "$GPG_SIGNING_PASSWD" | gpg --homedir .ghphp --pinentry-mode loopback --passphrase-fd 0 --armor --detach-sign flex-$GITHUB_SHA.zip
       - name: Clean up GPG
