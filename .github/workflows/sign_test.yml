@@ -17,6 +17,8 @@ jobs:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
         run: |
           gpg --version
+          mkdir .ghgpg
+          export GNUPGHOME=.ghgpg
           echo "$GPG_SIGNING_KEY" | gpg --batch --import
       - name: Sign tarballs
         env: 
