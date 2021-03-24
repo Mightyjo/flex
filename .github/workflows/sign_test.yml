@@ -21,8 +21,8 @@ jobs:
         env: 
           GPG_SIGNING_PASSWD: ${{ secrets.GPG_SIGNING_PASSWD }}
         run: |
-          echo "$GPG_SIGNING_PASSWD" | gpg --passphrase-fd 0 --armor --detach-sign flex-${{ env.GITHUB_SHA }}.tar.gz
-          echo "$GPG_SIGNING_PASSWD" | gpg --passphrase-fd 0 --armor --detach-sign flex-${{ env.GITHUB_SHA }}.zip
+          echo "$GPG_SIGNING_PASSWD" | gpg --batch --passphrase-fd 0 --armor --detach-sign flex-${{ env.GITHUB_SHA }}.tar.gz
+          echo "$GPG_SIGNING_PASSWD" | gpg --batch --passphrase-fd 0 --armor --detach-sign flex-${{ env.GITHUB_SHA }}.zip
       - name: Clean up GPG
         run: |
           echo "NOP"
