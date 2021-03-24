@@ -16,9 +16,9 @@ jobs:
         env: 
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
         run: |
-          gpg --version
           mkdir -m 700 .ghgpg
           export GNUPGHOME=.ghgpg
+          gpg --version
           echo "$GPG_SIGNING_KEY" | gpg --batch --import
       - name: Sign tarballs
         env: 
@@ -29,4 +29,5 @@ jobs:
           echo "$GPG_SIGNING_PASSWD" | gpg --pinentry-mode loopback --passphrase-fd 0 --armor --detach-sign flex-$GITHUB_SHA.zip
       - name: Clean up GPG
         run: |
-          echo "NOP"
+          export GNUPGHOME=.ghgpg
+          rm -rf .ghgpg
