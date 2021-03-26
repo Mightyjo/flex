@@ -58,6 +58,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Fast-forward to Milestone Tag
+        env:
+          ver: ${{ needs.milestone.outputs.version }}
+          tagname: ${{ needs.milestone.outputs.tagname }}
+        run: |
+          git fetch
+          git checkout $tagname
       - name: apt
         run: sudo apt-get install gcc-6 autoconf bison gettext autopoint help2man lzip texinfo texlive
       - name: autogen
