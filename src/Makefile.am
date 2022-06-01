@@ -53,6 +53,8 @@ flex_CFLAGS = $(AM_CFLAGS) $(WARNINGFLAGS)
 COMMON_SOURCES = \
 	buf.c \
 	ccl.c \
+	cpp-backend.c \
+	cpp-backend.h \
 	dfa.c \
 	ecs.c \
 	filter.c \
@@ -71,6 +73,7 @@ COMMON_SOURCES = \
 	scanopt.c \
 	scanopt.h \
 	skeletons.c \
+	skeletons.h \
 	sym.c \
 	tables.c \
 	tables.h \
