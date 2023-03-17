@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Homebrew
-      run: brew install autoconf bison gettext help2man lzip texinfo texlive
+      run: brew install autoconf automake libtool bison gettext help2man lzip texinfo texlive
     - name: autogen
       run: ./autogen.sh
     - name: configure
