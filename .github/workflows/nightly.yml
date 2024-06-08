@@ -17,19 +17,21 @@ jobs:
       actions: read
       contents: read
     steps:
-      - name: apt
-        run: sudo apt-get update && sudo apt-get install -y gcc autoconf automake libtool flex bison gettext autopoint help2man lzip texinfo texlive
       - uses: actions/checkout@v4
       - name: Change version number
         id: version
         run: |
           slug=$(git log -n 1 --pretty='format:%h-%as')
+          authorDate=$(echo $slug | cut -d '-' -f 2-4)
+          [ $(( $(date +%s) - $(date --date=$authorDate +%s) )) -ge 172800 ] && echo "::notice title=No Changes::No changes within the last two days. Skipping nightly build." && exit 1
           ver=$(sed -n "s/^\(AC_INIT.*generator\],\)\[\(.*\)\]\(,\[flex-help.*\)$/\2/p" $GITHUB_WORKSPACE/configure.ac)
           ver=${ver#v}
           ver=${ver%-*}
           ver=$ver-$slug
           echo "version=$ver" >> $GITHUB_OUTPUT
           sed -i "s/^\(AC_INIT.*generator\],\)\(.*\)\(,\[flex-help.*\)$/\1[$ver]\3/" $GITHUB_WORKSPACE/configure.ac
+      - name: apt
+        run: sudo apt-get update && sudo apt-get install -y gcc autoconf automake libtool flex bison gettext autopoint help2man lzip texinfo texlive
       - name: Update CHANGE_LOG
         run: |
           ./tools/git2cl > $GITHUB_WORKSPACE/ChangeLog
@@ -38,7 +40,6 @@ jobs:
           ./autogen.sh
           ./configure
           make
-          make check
           make distcheck
       - name: Make Git archives
         env:
