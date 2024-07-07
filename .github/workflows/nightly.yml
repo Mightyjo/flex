@@ -125,7 +125,7 @@ jobs:
         id: upload-nightly-artifacts
         env:
           update_needed: ${{ steps.update.outputs.needed }}
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.update_needed == 1 }}
         run: |
-          gh release upload nightlies ${{ env.ARTIFACT_GZ }} ${{ env.ARTIFACT_LZ }} ${{ env.SOURCE_GZ }} ${{ env.SOURCE_ZIP }} --clobber
+          gh release upload nightlies ${{ env.ARTIFACT_GZ }} ${{ env.ARTIFACT_LZ }} ${{ env.SOURCE_GZ }} ${{ env.SOURCE_ZIP }}
