@@ -125,16 +125,7 @@ jobs:
         id: upload-nightly-artifacts
         env:
           update_needed: ${{ steps.update.outputs.needed }}
+          GH_TOKEN: ${{ github.token }}
         if: ${{ env.update_needed == 1 }}
-        uses: softprops/action-gh-release@a74c6b72af54cfa997e81df42d94703d6313a2d0
-        with:
-          tag_name: nightlies
-          target_commitish: refs/tags/nightlies
-          make_latest: true
-          draft: false
-          prerelease: false
-          files: |
-            ${{ env.ARTIFACT_GZ }} 
-            ${{ env.ARTIFACT_LZ }} 
-            ${{ env.SOURCE_GZ }} 
-            ${{ env.SOURCE_ZIP }}
+        run: |
+          gh release upload nightlies ${{ env.ARTIFACT_GZ }} ${{ env.ARTIFACT_LZ }} ${{ env.SOURCE_GZ }} ${{ env.SOURCE_ZIP }} --clobber
