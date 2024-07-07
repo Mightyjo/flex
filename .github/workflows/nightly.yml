@@ -128,4 +128,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.update_needed == 1 }}
         run: |
+          echo ${{ github.repositoryUrl }}
+          echo ${{ github.api_url }}
           gh release upload nightlies ${{ env.ARTIFACT_GZ }} ${{ env.ARTIFACT_LZ }} ${{ env.SOURCE_GZ }} ${{ env.SOURCE_ZIP }}
