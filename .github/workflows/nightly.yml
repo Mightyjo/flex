@@ -5,8 +5,7 @@ on:
     - cron: '04 00 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
   nightly:
@@ -18,7 +17,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     permissions:
       actions: read
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Check time since last commit
@@ -125,9 +124,7 @@ jobs:
         id: upload-nightly-artifacts
         env:
           update_needed: ${{ steps.update.outputs.needed }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.update_needed == 1 }}
         run: |
-          echo ${{ github.repositoryUrl }}
-          echo ${{ github.api_url }}
-          gh release upload nightlies ${{ env.ARTIFACT_GZ }} ${{ env.ARTIFACT_LZ }} ${{ env.SOURCE_GZ }} ${{ env.SOURCE_ZIP }}
+          gh release upload nightlies ${{ env.ARTIFACT_GZ }} ${{ env.ARTIFACT_LZ }} ${{ env.SOURCE_GZ }} ${{ env.SOURCE_ZIP }} --clobber
