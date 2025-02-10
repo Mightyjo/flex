@@ -34,56 +34,123 @@
 
 #include "flexdef.h"
 #include "tables.h"
+#include "skeletons.h"
+
 
 /* START digested skeletons */
 
-const char *cpp_skel[] = {
-#include "cpp-flex.h"
-    0,
-};
+#include "cpp-backend.h"
 
-const char *c99_skel[] = {
-#include "c99-flex.h"
-    0,
-};
+#include "c99-backend.h"
 
 const char *go_skel[] = {
+/* FIXME: Refactor like cpp-backend when Go backend is ready.
 #include "go-flex.h"
+*/
     0,
 };
 
 /* END digested skeletons */
 
-/* Method table describing a language-specific back end.
- * Even if this never gets a member other than the skel
- * array, it prevents us from getting lost in a maze of
- * twisty array reference levels, all different.
+
+/* backends is an array of skeleton code-emitting backend structs.
+/* It uses the flex_backend_t enum so we don't have to care what order it's in.
  */
-struct flex_backend_t {
-	const char **skel;		// Digested skeleton file
-};
+static struct flex_backend_t backends[FLEX_BACKEND_ID_MAX];
 
-static struct flex_backend_t backends[] = {
-    {.skel=cpp_skel},
-    {.skel=c99_skel},
-    {.skel=go_skel},
-    {NULL}
-};
+/* backend_stack is an array-based stack of flex_backend_ids.                  
+/* It lets us keep track of which skeleton and emitter are in use and allows
+/* us to switch to another backend during runtime, for example to dump an 
+/* auxiliary table. 
+/* The need to switch backends should be uncommon, the stack is only as deep
+/* as the number of available backends. 
+/* backen_stack_head is declared static so it must be manipulated through
+/* the stack functions defined in this module.
+ */
+flex_backend_id_t backend_stack[FLEX_BACKEND_ID_MAX+1];
+static unsigned int backend_stack_head = 0;
 
-static struct flex_backend_t *backend = &backends[0];
+/* Push a flex_backend_id onto the backend stack. 
+/* Returns false when the stack is full, and true otherwise.
+ */
+bool push_backend(flex_backend_id_t bid){
+	++backend_stack_head;
+	if( backend_stack_head >= FLEX_BACKEND_ID_MAX ){
+		--backend_stack_head;
+		flexerror(_("backend stack depth exceeded"));
+		return false;
+	}
+	else {
+		backend_stack[backend_stack_head-1] = bid;
+	}
+	return true;
+}
+
+/* Pop a flex_backend_id off of the backend stack.
+/* Returns the FLEX_BACKEND_ID_MAX when the stack is empty, and the
+/* popped backend id otherwise. */
+flex_backend_id_t pop_backend(void) {
+	flex_backend_id_t ret = FLEX_BACKEND_ID_MAX;
+	if( backend_stack_head > 0 ) {
+		ret = backend_stack[backend_stack_head-1];
+		--backend_stack_head;
+		return ret;
+	}
+	else {
+		flexerror(_("attempt to pop empty backend stack"));
+		return ret;
+	}
+}
+
+/* Return the flex_backend_id on top of the backend stack.
+/* Returns the FLEX_BACKEND_ID_MAX when the stack is empty, and the
+/* top backend id otherwise. */
+flex_backend_id_t top_backend(void){
+	if( backend_stack_head > 0 ) {
+		return backend_stack[backend_stack_head-1];
+	}
+	else {
+		flexerror(_("attempt to read the top of empty backend stack"));
+		return FLEX_BACKEND_ID_MAX;
+	}
+}
+
+
+
+
+const struct flex_backend_t *get_backend(void) {
+	return &backends[top_backend()];
+}
+
+/* Initialize backends */
+void init_backends( void ) {
+	backends[FLEX_BACKEND_CPP] = cpp_backend;
+	backends[FLEX_BACKEND_C99] = c99_backend;
+	backends[FLEX_BACKEND_GO].skel=go_skel;
+	backends[FLEX_BACKEND_ID_MAX] = (struct flex_backend_t){NULL};
+}
 
 /* Functions for querying skeleton properties. */
+const char *_skel_property(const flex_backend_id_t backend_id, const char *propname);
+static bool _boneseeker(const flex_backend_id_t backend_id, const char *bone);
 
+/* TODO: What does this mean now? */
 bool is_default_backend(void)
 {
-    return backend == &backends[0];
+    return top_backend() == FLEX_BACKEND_DEFAULT;
 }
 
 /* Search for a string in the skeleton prolog, where macros are defined.
  */
-static bool boneseeker(const char *bone)
+static bool boneseeker(const char *bone) {
+	return _boneseeker(top_backend(), bone);
+}
+
+static bool _boneseeker(const flex_backend_id_t backend_id, const char *bone)
 {
 	int i;
+
+	const struct flex_backend_t *backend = &backends[backend_id];
 
 	for (i = 0; backend->skel[i] != NULL; i++) {
 		const char *line = backend->skel[i];
@@ -95,36 +162,42 @@ static bool boneseeker(const char *bone)
 	return false;
 }
 
-void backend_by_name(const char *name)
+flex_backend_id_t backend_by_name(const char *name)
 {
 	const char *prefix_property;
+	flex_backend_id_t backend_id = FLEX_BACKEND_DEFAULT, i = FLEX_BACKEND_DEFAULT;
+
 	if (name != NULL) {
 		if (strcmp(name, "nr") == 0) {
-			backend = &backends[0];
+			backend_id = FLEX_BACKEND_CPP;
 			ctrl.reentrant = false;
 			goto backend_ok;
 		}
 		if (strcmp(name, "r") == 0) {
-			backend = &backends[0];
+			backend_id = FLEX_BACKEND_CPP;
 			ctrl.reentrant = true;
 			goto backend_ok;
 		}
-		for (backend = &backends[0]; backend->skel != NULL; backend++) {
-			if (strcasecmp(skel_property("M4_PROPERTY_BACKEND_NAME"), name) == 0)
+		for (i = 0; backends[i].skel != NULL && i < FLEX_BACKEND_ID_MAX; ++i) {
+			if (strcasecmp(_skel_property(i, "M4_PROPERTY_BACKEND_NAME"), name) == 0) {
+				backend_id = i;
 				goto backend_ok;
+			}
 		}
 		flexerror(_("no such back end"));
+		return FLEX_BACKEND_ID_MAX;
 	}
   backend_ok:
 	ctrl.rewrite = !is_default_backend();
-	ctrl.backend_name = xstrdup(skel_property("M4_PROPERTY_BACKEND_NAME"));
-	ctrl.traceline_re = xstrdup(skel_property("M4_PROPERTY_TRACE_LINE_REGEXP"));
-	ctrl.traceline_template = xstrdup(skel_property("M4_PROPERTY_TRACE_LINE_TEMPLATE"));
-	ctrl.have_state_entry_format = boneseeker("m4_define([[M4_HOOK_STATE_ENTRY_FORMAT]]");
-	prefix_property = skel_property("M4_PROPERTY_PREFIX");
+	ctrl.backend_name = xstrdup(_skel_property(backend_id, "M4_PROPERTY_BACKEND_NAME"));
+	ctrl.traceline_re = xstrdup(_skel_property(backend_id, "M4_PROPERTY_TRACE_LINE_REGEXP"));
+	ctrl.traceline_template = xstrdup(_skel_property(backend_id, "M4_PROPERTY_TRACE_LINE_TEMPLATE"));
+	ctrl.have_state_entry_format = _boneseeker(backend_id, "m4_define([[M4_HOOK_STATE_ENTRY_FORMAT]]");
+	prefix_property = _skel_property(backend_id, "M4_PROPERTY_PREFIX");
 	if (prefix_property != NULL)
 		ctrl.prefix = xstrdup(prefix_property);
 	flex_init_regex(ctrl.traceline_re);
+	return backend_id;
 }
 
 const char *suffix (void)
@@ -147,11 +220,16 @@ const char *suffix (void)
  * definition must be single-line.  Don't call this a second time before
  * stashing away the previous return, we cheat with static buffers.
  */
-const char *skel_property(const char *propname)
+const char *skel_property(const char *propname){
+	return _skel_property(top_backend(), propname);
+}
+
+const char *_skel_property(const flex_backend_id_t backend_id, const char *propname)
 {
 	int i;
 	static char name[256], value[256], *np, *vp;;
 	const char *cp;
+	const struct flex_backend_t *backend = &backends[backend_id];
 
 	for (i = 0; backend->skel[i] != NULL; i++) {
 		const char *line = backend->skel[i];
@@ -212,6 +290,7 @@ void skelout (bool announce)
 	char    buf_storage[MAXLINE];
 	char   *buf = buf_storage;
 	bool   do_copy = true;
+	const struct flex_backend_t *backend = get_backend();
 
 	/* Loop pulling lines either from the skelfile, if we're using
 	 * one, or from the selected back end's skel[] array.
@@ -227,8 +306,8 @@ void skelout (bool announce)
 		if (buf[0] == '%') {	/* control line */
 			/* print the control line as a comment. */
 			if (ctrl.ddebug && buf[1] != '#') {
-			    comment(buf);
-			    outc ('\n');
+			    backend->comment(backend, buf);
+				backend->newline(backend);
 			}
 			if (buf[1] == '#') {
 				/* %# indicates comment line to be ignored */
@@ -236,8 +315,8 @@ void skelout (bool announce)
 			else if (buf[1] == '%') {
 				/* %% is a break point for skelout() */
 				if (announce) {
-					comment(buf);
-					outc ('\n');
+					backend->comment(backend, buf);
+					backend->newline(backend);
 				}
 				return;
 			}
@@ -246,8 +325,10 @@ void skelout (bool announce)
 			}
 		}
 
-		else if (do_copy) 
-			outn (buf);
+		else if (do_copy) {
+			backend->verbatim(backend, buf);
+			backend->newline(backend);
+		}
 	}			/* end while */
 }
 
