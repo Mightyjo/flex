@@ -1,5 +1,7 @@
 /* scanflags - flags used by scanning. */
 
+/* SPDX-License-Identifier: BSD-3-Clause-flex */
+
 /*  Copyright (c) 1990 The Regents of the University of California. */
 /*  All rights reserved. */
 
@@ -62,6 +64,7 @@ sf_init (void)
 {
     assert(_sf_stk == NULL);
     _sf_max = 32;
+    _sf_top_ix = 0;
     _sf_stk = malloc(sizeof(scanflags_t) * _sf_max);
     if (!_sf_stk)
         lerr_fatal(_("Unable to allocate %zu of stack"), sizeof(scanflags_t));
