@@ -1,5 +1,7 @@
 /* filter - postprocessing of flex output through filters */
 
+/* SPDX-License-Identifier: BSD-3-Clause-flex */
+
 /*  This file is part of flex. */
 
 /*  Redistribution and use in source and binary forms, with or without */
