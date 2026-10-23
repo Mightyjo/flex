@@ -1,7 +1,9 @@
 #ifdef FLEX_SCANNER
 /*
 dnl   tables_shared.c - tables serialization code
-dnl 
+dnl
+dnl   SPDX-License-Identifier: BSD-3-Clause-flex
+dnl
 dnl   Copyright (c) 1990 The Regents of the University of California.
 dnl   All rights reserved.
 dnl 
